@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./css/styles.css">
+  <title>Dashboard - My Diary</title>
+</head>
+
+<body>
+  <header id="site-header">
+    <div class="container">
+      <nav class="nav">
+        <a href="./" class="nav-logo">My Diary</a>
+        <ul class="nav-menu-wrapper">
+          <li class="nav-menu-item">
+            <a href="./settings.html">My Settings</a>
+          </li>
+          <li class="nav-menu-item">
+            <a href="./logout.html">Logout</a>
+          </li>
+        </ul>
+      </nav>
+      <hr class="hrule">
+    </div>
+  </header>
+  <main id="site-main">
+    <div class="container">
+      <section class="diary">
+        <div class="diary-form-wrapper">
+          <form action="/entries">
+            <!-- <div>
+              <input class="diary-title" type="text" placeholder="Diary Title">
+            </div> -->
+            <div>
+              <textarea class="diary-body" name="" id="" cols="30" rows="10" placeholder="What is it about?"></textarea>
+            </div>
+            <div class="clearfix">
+              <button class="diary-button" type="submit">Save Diary</button>
+            </div>
+          </form>
+        </div>
+        <div class="dairy">
+          <p class="dairy-header">My Diary Posts</p>
+          <ul class="dairy-post">
+            <li class="dairy-post-item">
+              <span class="dairy-post-date">20th December, 2017</span>
+              <div class="dairy-post-content">Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure nam minima soluta exercitationem quia, tempora
+                officiis eveniet aliquid praesentium quae doloremque deleniti ipsum omnis sapiente dolores fuga aliquam?
+                Quisquam, quibusdam? Dicta ipsa recusandae aut et veniam deserunt soluta facere quam ea at nobis beatae iste,
+                maxime culpa quaerat molestias libero sequi adipisci vero? Assumenda cupiditate, saepe vitae similique sed
+                dicta! Dolorem fuga magnam ratione quae expedita veniam voluptas rerum eius at optio, nulla aut temporibus,
+                corporis delectus autem omnis iste quos dolore cumque aliquid doloremque? Optio quidem quisquam quae sint?</div>
+              <a class="dairy-post-edit" href="/entry/id">Edit</a>
+            </li>
+            <li class="dairy-post-item">
+              <span class="dairy-post-date">11th September, 2017</span>
+              <div class="dairy-post-content">Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure nam minima soluta exercitationem quia, tempora
+                officiis eveniet aliquid praesentium quae doloremque deleniti ipsum omnis sapiente dolores fuga aliquam?
+                Quisquam, quibusdam? Dicta ipsa recusandae aut et veniam deserunt soluta facere quam ea at nobis beatae iste,
+                maxime culpa quaerat molestias libero sequi adipisci vero? Assumenda cupiditate, saepe vitae similique sed
+                dicta! Dolorem fuga magnam ratione quae expedita veniam voluptas rerum eius at optio, nulla aut temporibus,
+                corporis delectus autem omnis iste quos dolore cumque aliquid doloremque? Optio quidem quisquam quae sint?</div>
+              <a class="dairy-post-edit" href="/entry/id">Edit</a>
+            </li>
+
+          </ul>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer id="site-footer">
+    <div class="container">
+      <hr class="hrule">
+      <p>Made with
+        <span>&#10084;</span> by Jesse</p>
+    </div>
+  </footer>
+</body>
+
+</html>
