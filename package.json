@@ -7,6 +7,7 @@
   "author": "Jesse Egbosoinu",
   "license": "ISC",
   "scripts": {
+    "test": "nyc mocha --exit --compilers js:babel-register",
     "server": "babel-node server --presets es2015"
   },
   "dependencies": {
