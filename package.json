@@ -1,0 +1,15 @@
+{
+  "name": "my-diary",
+  "version": "1.0.0",
+  "description": "MyDiary is an online journal where users can pen down their thoughts and feelings.",
+  "main": "server.js",
+  "keywords": [],
+  "author": "Jesse Egbosoinu",
+  "license": "ISC",
+  "scripts": {
+    "test": ""
+  },
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
