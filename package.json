@@ -8,6 +8,7 @@
   "license": "ISC",
   "scripts": {
     "test": "nyc mocha --exit --compilers js:babel-register",
+    "coveralls": "nyc --reporter=lcov npm test",
     "server": "babel-node server --presets env"
   },
   "dependencies": {
