@@ -7,9 +7,13 @@
   "author": "Jesse Egbosoinu",
   "license": "ISC",
   "scripts": {
+    "clean": "rm -rf build && mkdir build",
+    "build-server": "babel -d ./build ./server",
+    "build": "npm run clean && npm run build-server",
+    "start": "npm run build && node ./build/server",
     "test": "mocha --exit --require babel-register test",
     "coveralls": "nyc --reporter=lcov --reporter=text-lcov npm test",
-    "server": "babel-node server --presets env"
+    "server": "babel-node ./server/server --presets env"
   },
   "dependencies": {
     "express": "^4.16.3"

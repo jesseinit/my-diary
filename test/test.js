@@ -1,6 +1,6 @@
 import chai from 'chai';
 import { expect } from 'chai';
-import app from '../server';
+import app from '../server/server';
 
 const chaiHttp = require('chai-http');
 
