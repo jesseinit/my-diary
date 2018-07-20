@@ -15,4 +15,16 @@ router.get('/entries/:id', (req, res) => {
   res.send(diary);
 });
 
+router.post('/entries', (req, res) => {
+  if (!req.body.post || req.body.post.length < 2) {
+    res.status(400).send({ status: 400, message: 'Oops - Bad Request' });
+  }
+  const diary = {
+    id: diaries.length + 1,
+    post: req.body.post
+  };
+  diaries.push(diary);
+  res.status(201).send(diaries);
+});
+
 export default router;
