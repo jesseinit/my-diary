@@ -7,8 +7,8 @@
   "author": "Jesse Egbosoinu",
   "license": "ISC",
   "scripts": {
-    "test": "mocha --exit --compilers js:babel-register",
-    "coveralls": "nyc --reporter=lcov npm test",
+    "test": "mocha --exit --require babel-register test",
+    "coveralls": "nyc --reporter=lcov --reporter=text-lcov npm test",
     "server": "babel-node server --presets env"
   },
   "dependencies": {
