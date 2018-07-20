@@ -8,7 +8,8 @@
   "license": "ISC",
   "scripts": {
     "test": "nyc mocha --exit --compilers js:babel-register",
-    "server": "babel-node server --presets es2015"
+    "coveralls": "nyc --reporter=lcov npm test",
+    "server": "babel-node server --presets env"
   },
   "dependencies": {
     "express": "^4.16.3"
@@ -16,7 +17,7 @@
   "devDependencies": {
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
