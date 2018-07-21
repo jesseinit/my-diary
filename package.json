@@ -8,12 +8,12 @@
   "license": "ISC",
   "scripts": {
     "clean": "rm -rf build && mkdir build",
-    "build-server": "babel -d ./build ./server",
-    "build": "npm run clean && npm run build-server",
+    "build-dev": "babel -d ./build ./server",
+    "start:dev": "npm run build-dev && node ./build/server",
+    "build": "npm run clean && npm run build-dev",
     "start": "npm run build && node ./build/server",
-    "test": "mocha --exit --require babel-register test",
-    "coveralls": "nyc --reporter=lcov --reporter=text-lcov npm test",
-    "server": "babel-node ./server/server --presets env"
+    "test": "mocha --exit --require babel-register",
+    "coveralls": "nyc --reporter=lcov --reporter=text-lcov npm test"
   },
   "dependencies": {
     "express": "^4.16.3"
