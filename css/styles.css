@@ -67,6 +67,7 @@ img {
   background-image: url('https://i.imgur.com/uvS4Gk3.jpg');
   background-attachment: fixed;
   background-size: cover;
+  min-height: 100vh;
 }
 
 /* HEADER RULES STARTS */
@@ -210,6 +211,10 @@ img {
 }
 /* END OF FORM STYLES */
 
+.diary-form {
+  margin-top: 50px;
+}
+
 .form_wrapper span {
   margin-bottom: 20px;
   text-align: center;
@@ -251,6 +256,11 @@ img {
   background: #fcf3a1;
   border: none;
   outline: none;
+}
+
+.diary-date {
+  margin-top: 10px;
+  height: 30px;
 }
 
 .diary-button {
@@ -312,6 +322,18 @@ img {
   margin-bottom: 10px;
 }
 
+.diary-btn {
+  display: block;
+  outline: none;
+  border: none;
+  width: 130px;
+  font-size: 20px;
+  padding: 5px 14px;
+  background-color: #fc6341;
+  color: white;
+  cursor: pointer;
+}
+
 .diary-card-body {
   margin-bottom: 10px;
   width: 90%;
@@ -340,22 +362,14 @@ img {
 .settings-title {
   font-size: 1.2em;
   margin-bottom: 10px;
+  color: #222;
 }
 
 .settings-tag {
   font-weight: 300;
   font-size: 0.85em;
   margin-bottom: 2px;
-}
-.settings-title {
-  font-size: 1.2em;
-  margin-bottom: 10px;
-}
-
-.settings-tag {
-  font-weight: 300;
-  font-size: 0.85em;
-  margin-bottom: 2px;
+  color: #222;
 }
 
 .diary-totals {
