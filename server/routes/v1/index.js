@@ -16,12 +16,13 @@ router.get('/entries/:id', (req, res) => {
 });
 
 router.post('/entries', (req, res) => {
-  if (!req.body.post || req.body.post.length < 2) {
-    res.status(400).send({ status: 400, message: 'Oops - Bad Request' });
+  if (!req.body.title || !req.body.post) {
+    res.status(400).send({ err: 'Oops - Bad Request' });
   }
   const diary = {
     id: diaries.length + 1,
-    post: req.body.post
+    title: req.body.title.trim(),
+    post: req.body.post.trim()
   };
   diaries.push(diary);
   res.status(201).send(diaries);
