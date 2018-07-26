@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import app from '../server/server';
+import db from '../server/config/db';
 
 const chai = require('chai');
 
@@ -55,16 +56,20 @@ describe('Diary', () => {
     });
   });
 
-  describe('POST: /api/v1/entries', () => {
+  describe('The user should be able to create a diary story', () => {
+    const numberOfStories = db.length;
+    const story = 'Happy People';
     it('should CREATE a new diary entry', done => {
       chai
         .request(app)
         .post('/api/v1/entries/')
-        .send({ post: "They Don't Know" })
+        .send({ title: 'We Live', post: story })
         .end((err, res) => {
           expect(res.status).to.equal(201);
-          expect(res).to.be.an('object');
-          expect(res.body[res.body.length - 1].post).to.not.match(/^ *$/);
+          expect(res.body[res.body.length - 1].post).to.equal(story);
+          expect(res.body[numberOfStories - 1]).to.have.property('id');
+          expect(res.body[numberOfStories - 1]).to.have.property('post');
+          expect(res.body.length).to.equal(numberOfStories + 1);
         });
       done();
     });
