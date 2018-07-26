@@ -75,32 +75,33 @@ describe('Diary', () => {
     });
   });
 
-  describe('PUT: /api/v1/entries/:id', () => {
-    it('should UPDATE a diary entry when an id is FOUND', done => {
+  describe('When the user tries to update a diary story', () => {
+    const updateStory = 'Let me go in already!';
+
+    it('1). It should update the story if the story exists', done => {
+      const storyId = 5;
       chai
         .request(app)
-        .put(`/api/v1/entries/${id}`)
-        .send({ post: 'Done' })
-        .end((error, response) => {
-          if (response.body[id] !== undefined) {
-            expect(response.status).to.equal(200);
-            expect(response.body[id]).to.have.property('id');
-            expect(response.body[id]).to.have.property('post');
-            expect(response.body[id]).to.be.an('object');
-          }
+        .put(`/api/v1/entries/${storyId}`)
+        .send({ title: 'We Live', post: updateStory })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body[storyId - 1].post).to.equal(updateStory);
+          expect(res.body[storyId - 1])
+            .to.have.property('id')
+            .to.equal(storyId);
           done();
         });
     });
-
-    it('should RETURN Undefined for a diary entry when an id is NOT FOUND', done => {
+    it('2). It should NOT update the story if the story does not exist', done => {
+      const storyId = 80;
       chai
         .request(app)
-        .put(`/api/v1/entries/${id}`)
-        .send({ post: 'Done' })
-        .end((error, response) => {
-          if (response.body[id] === 'undefined') {
-            expect(response.body[id]).to.be.an('undefined');
-          }
+        .put(`/api/v1/entries/${storyId}`)
+        .send({ title: 'We Live', post: 'Done' })
+        .end((err, res) => {
+          expect(res.body.err).to.equal('Diary story not found');
+          expect(res.body.length).to.equal(undefined);
           done();
         });
     });
