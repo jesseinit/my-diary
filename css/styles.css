@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:300,400');
 html {
   box-sizing: border-box;
+  font-size: 16px;
 }
 
 *,
@@ -59,7 +60,7 @@ img {
 /* CSS RESET ENDS */
 
 .container {
-  width: 80%;
+  width: 85%;
   margin: 0 auto;
 }
 
@@ -234,23 +235,24 @@ img {
 }
 
 .diary-title {
+  padding: 20px 10px;
   border: none;
+  box-shadow: 0 10px 30px -20px rgb(110, 110, 110);
   outline: none;
   font-size: 2em;
   display: block;
   width: 100%;
   background: inherit;
-  padding: 5px;
 }
 
 .diary-body {
   font-family: inherit;
   margin-top: 10px;
-  height: 200px;
+  height: 330px;
   line-height: 2;
   width: 100%;
   max-width: 100%;
-  padding: 5px;
+  padding: 10px;
   resize: none;
   font-size: 16px;
   background: #fcf3a1;
@@ -260,7 +262,8 @@ img {
 
 .diary-date {
   margin-top: 10px;
-  height: 30px;
+  height: 40px;
+  font-family: inherit;
 }
 
 .diary-button {
@@ -318,7 +321,10 @@ img {
 }
 
 .diary-card-title {
+  font-weight: 300;
   font-size: 2em;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #b6b6b6;
   margin-bottom: 10px;
 }
 
@@ -347,9 +353,13 @@ img {
   padding: 5px 0;
 }
 
-.diary-card-view a {
-  font-size: 16px;
+.diary-card-view {
+  font-size: 14px;
   padding: 5px 10px;
+  border: 1px dashed #eee;
+}
+
+.diary-card-view a {
   color: #eee;
 }
 
@@ -377,4 +387,93 @@ img {
   border-radius: 100%;
   padding: 5px 10px;
   color: #fc6240;
+}
+
+.view-diary {
+  margin-top: 50px;
+}
+
+.view-card {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 10px;
+  background: #999;
+}
+
+.view-card-title {
+  font-weight: 300;
+  font-size: 2em;
+  margin-bottom: 15px;
+  text-decoration: underline;
+}
+
+.view-card-date {
+  font-size: 14px;
+  padding: 5px 0;
+  margin-bottom: 10px;
+  /* background: #000; */
+  color: #fff;
+}
+
+.view-card-body {
+  margin: 10px 0 30px;
+}
+
+.view-card-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.view-del-btn,
+.view-edit-btn {
+  color: #fff;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.view-del-btn {
+  border: 1px solid #222;
+}
+
+.view-edit-btn {
+  background: #fc6240;
+}
+
+@media screen and (min-width: 320px) {
+  .container {
+    width: 90%;
+  }
+  .nav-logo {
+    font-size: 1.1em;
+  }
+
+  .nav-menu-item a {
+    font-size: 13px;
+  }
+  .diary-card {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: 480px) {
+  .nav-logo {
+    font-size: 1.5em;
+  }
+  .nav-menu-item a {
+    font-size: 14px;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  .diary-card {
+    width: 49%;
+  }
+}
+
+@media screen and (min-width: 960px) {
+  .diary-card {
+    width: 33%;
+  }
 }
