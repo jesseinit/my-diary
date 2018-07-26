@@ -9,7 +9,6 @@ const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 
 describe('Diary', () => {
-  const id = 9;
   describe('GET: /api/v1/entries', () => {
     it('should GET all diary entries', done => {
       chai
@@ -23,34 +22,28 @@ describe('Diary', () => {
     });
   });
 
-  describe('GET: /api/v1/entries/:id', () => {
-    it('should GET a single diary entry', done => {
+  describe('The user', () => {
+    it('1). should be able to view a diary story if it exists', done => {
       chai
         .request(app)
-        .get(`/api/v1/entries/${id}`)
+        .get(`/api/v1/entries/1`)
         .end((err, res) => {
           if (res.status === 200) {
             expect(res.status).to.equal(200);
             expect(res.body).to.be.an('object');
-            expect(res.body).to.haveOwnProperty('id');
-            expect(res.body).to.haveOwnProperty('post');
+            expect(res.body).to.have.property('id');
+            expect(res.body).to.have.property('post');
           }
           done();
         });
     });
-
-    it('should RETURN 404 if diary entry is not found', done => {
+    it('2). should get an error if the story does not exit', done => {
       chai
         .request(app)
-        .get(`/api/v1/entries/${id}`)
+        .get(`/api/v1/entries/10`)
         .end((err, res) => {
-          if (res.status === 404) {
-            expect(res.status).to.equal(404);
-            expect(res.body)
-              .to.haveOwnProperty('status')
-              .equal(404);
-            expect(res.body).to.haveOwnProperty('message');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body).to.property('err');
           done();
         });
     });

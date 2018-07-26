@@ -8,11 +8,13 @@ router.get('/entries', (req, res) => {
 });
 
 router.get('/entries/:id', (req, res) => {
-  const diary = diaries.find(d => d.id === parseInt(req.params.id));
+  const diary = diaries.find(story => story.id === parseInt(req.params.id));
+
   if (!diary) {
-    res.status(404).send({ status: 404, message: 'Diary post not found' });
+    res.status(404).send({ err: 'Dairy story not found' });
   }
-  res.send(diary);
+
+  res.status(404).send(diary);
 });
 
 router.post('/entries', (req, res) => {
