@@ -16,7 +16,9 @@
     "coveralls": "nyc --reporter=lcov --reporter=text-lcov npm test"
   },
   "dependencies": {
-    "express": "^4.16.3"
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3",
+    "pg": "^7.4.3"
   },
   "devDependencies": {
     "babel": "^6.23.0",
