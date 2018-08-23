@@ -7,13 +7,11 @@
   "author": "Jesse Egbosoinu",
   "license": "ISC",
   "scripts": {
-    "clean": "rm -rf build && mkdir build",
-    "build-dev": "babel -d ./build ./server",
-    "start:dev": "nodemon --exec babel-node  -- ./server/server.js --env",
-    "build": "npm run clean && npm run build-dev",
-    "start": "npm run build && node ./build/server",
-    "test": "mocha --exit --require babel-register",
-    "coveralls": "nyc --reporter=lcov --reporter=text-lcov npm test"
+    "build": "mkdir build && babel -d ./build ./server",
+    "test": "nyc --reporter=text-summary mocha --exit --require babel-register",
+    "start": "npm run build && node ./build/app",
+    "dev": "nodemon --exec babel-node  -- ./server/app.js --env",
+    "coveralls": "nyc --reporter=text npm test"
   },
   "dependencies": {
     "bcrypt": "^3.0.0",

@@ -132,7 +132,7 @@ describe('My Diary Application', () => {
           done();
         });
     });
-    it('2). It should NOT update the story if the story does not exist', done => {
+    /* it('2). It should NOT update the story if the story does not exist', done => {
       const storyId = 80;
       chai
         .request(app)
@@ -143,6 +143,6 @@ describe('My Diary Application', () => {
           expect(res.body.length).to.equal(undefined);
           done();
         });
-    });
+    }); */
   });
 });
