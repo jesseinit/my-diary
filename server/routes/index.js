@@ -1,7 +1,7 @@
 import express from 'express';
 import diaries from '../config/db';
 import user from '../controller/userController';
-import helper from '../helpers/validateInput';
+import helper from '../helpers';
 
 const router = express.Router();
 
