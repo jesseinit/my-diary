@@ -3,7 +3,9 @@ import bcrypt from 'bcrypt';
 import db from '../helpers/connection';
 
 const query = {
-  find: 'SELECT * FROM users WHERE email = $1'
+  find: 'SELECT * FROM users WHERE email = $1',
+  regUser:
+    'INSERT INTO users (email,fullname,password) VALUES ( $1, $2, $3) RETURNING *'
 };
 
 class User {
