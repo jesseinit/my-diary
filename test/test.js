@@ -13,6 +13,10 @@ chai.use(chaiHttp);
 let authToken = '';
 
 describe('My Diary Application', () => {
+  after(() => {
+    db.query('DROP TABLE users, diaries');
+  });
+
   // Signup
   describe('When the user tries to signup an account', () => {
     it('It should return an error for an unprocessable input { Status 422 }', done => {
