@@ -1,7 +1,10 @@
 import express from 'express';
 import diaries from '../../config/db';
+import user from '../../controller/userController';
 
 const router = express.Router();
+
+router.post('/auth/signup', user.signUp);
 
 router.get('/entries', (req, res) => {
   res.status(200).send(diaries);

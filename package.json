@@ -16,8 +16,10 @@
     "coveralls": "nyc --reporter=lcov --reporter=text-lcov npm test"
   },
   "dependencies": {
+    "bcrypt": "^3.0.0",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
+    "jsonwebtoken": "^8.3.0",
     "pg": "^7.4.3"
   },
   "devDependencies": {
@@ -28,7 +30,7 @@
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
     "coveralls": "^3.0.2",
-    "eslint": "^5.1.0",
+    "eslint": "^4.19.1",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-import": "^2.13.0",
