@@ -12,6 +12,13 @@ router.post(
   user.signUp
 );
 
+router.post(
+  '/auth/login',
+  helper.validateInput.logIn,
+  helper.validateInput.validationHandler,
+  user.logIn
+);
+
 router.get('/entries', (req, res) => {
   res.status(200).send(diaries);
 });
