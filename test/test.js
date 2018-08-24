@@ -425,4 +425,78 @@ describe('My Diary Application', () => {
         });
     });
   });
+
+  // DELETE
+  describe('When the user tries to DELETE a specific diary', () => {
+    // Test if token is set
+    it('It should return - 403 - unauthorised access when a token is not sent', done => {
+      chai
+        .request(app)
+        .del(`/api/v1/entries/${cachedEntry.id}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(403);
+          done();
+        });
+    });
+
+    // Test if token is invalid
+    it('It should return - 401 - forbidden when token is expired or invalid', done => {
+      chai
+        .request(app)
+        .del(`/api/v1/entries/${cachedEntry.id}`)
+        .set('Authorization', `Bearer invalidToken`)
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          done();
+        });
+    });
+
+    // Test for if the story exist
+    it('It should return statusCode 500 when a user tries to DELETE a story that exist', done => {
+      chai
+        .request(app)
+        .del(`/api/v1/entries/${cachedEntry.id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          done();
+        });
+    });
+
+    // Test for if the story does not exist
+    it('It should return statusCode 404 when a user tries to DELETE a story that does not exist', done => {
+      chai
+        .request(app)
+        .del(`/api/v1/entries/${cachedEntry.id + 1}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          done();
+        });
+    });
+
+    it('It should return statusCode 500 when a user tries to DELETE a story passing ', done => {
+      chai
+        .request(app)
+        .del(`/api/v1/entries/0`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(422);
+          done();
+        });
+    });
+
+    it('It should return internal server error for a connection error to the database { Status 500 } ', done => {
+      const stub = sinon.stub(db, 'query').rejects();
+      chai
+        .request(app)
+        .del(`/api/v1/entries/${cachedEntry.id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          stub.restore();
+          done();
+        });
+    });
+  });
 });
