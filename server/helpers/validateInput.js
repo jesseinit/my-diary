@@ -13,6 +13,15 @@ const signUp = [
     .withMessage('Password should contain atleast 8 characters')
 ];
 
+const logIn = [
+  body('email')
+    .isEmail()
+    .withMessage('Please enter a valid email'),
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Password should contain atleast 8 characters')
+];
+
 const validationHandler = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -22,6 +31,6 @@ const validationHandler = (req, res, next) => {
   }
 };
 
-const validations = { signUp, validationHandler };
+const validations = { signUp, logIn, validationHandler };
 
 export default validations;
