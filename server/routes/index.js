@@ -22,15 +22,13 @@ router.post(
 
 router.get('/entries', helper.verifyAuthToken, diary.getAllEntries);
 
-router.get('/entries/:id', (req, res) => {
-  const diary = diaries.find(story => story.id === parseInt(req.params.id));
-
-  if (!diary) {
-    res.status(404).send({ err: 'Dairy story not found' });
-  }
-
-  res.status(404).send(diary);
-});
+router.get(
+  '/entries/:id',
+  helper.verifyAuthToken,
+  helper.validateInput.params,
+  helper.validateInput.validationHandler,
+  diary.getSelectedEntries
+);
 
 router.post('/entries', helper.verifyAuthToken, diary.createNewEntry);
 
