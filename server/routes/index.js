@@ -39,4 +39,12 @@ router.put(
   diary.updateSelectedEntry
 );
 
+router.delete(
+  '/entries/:id',
+  helper.verifyAuthToken,
+  helper.validateInput.params,
+  helper.validateInput.validationHandler,
+  diary.deleteSelectedEntry
+);
+
 export default router;
