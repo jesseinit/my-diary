@@ -326,4 +326,103 @@ describe('My Diary Application', () => {
         });
     });
   });
+
+  // UPDATE
+  describe('When the user tries to UPDATE a specific diary', () => {
+    // Test if token is set
+    it('It should return - 403 - unauthorised access when a token is not sent', done => {
+      chai
+        .request(app)
+        .put(`/api/v1/entries/${cachedEntry.id}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(403);
+          done();
+        });
+    });
+
+    // Test if token is invalid
+    it('It should return - 401 - forbidden when token is expired or invalid', done => {
+      chai
+        .request(app)
+        .put(`/api/v1/entries/${cachedEntry.id}`)
+        .set('Authorization', `Bearer invalidToken`)
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          done();
+        });
+    });
+
+    // Test if it the story does not exist
+    it('It should return - 404 - forbidden if it the story does not exist', done => {
+      chai
+        .request(app)
+        .put(`/api/v1/entries/${cachedEntry.id + 1}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          done();
+        });
+    });
+
+    // Test if the story is same day
+    it('It should return - 200 - and update story if the story is same day', done => {
+      chai
+        .request(app)
+        .put(`/api/v1/entries/${cachedEntry.id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(entry.validEntry)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          done();
+        });
+    });
+
+    // Test if the story is not same day
+    it('It should return - 403 - if the story is not same day', done => {
+      const clock = sinon.useFakeTimers(new Date(cachedEntry.created_on).getTime());
+      clock.tick(24.01 * 3600 * 1000);
+      chai
+        .request(app)
+        .post('/api/v1/auth/login')
+        .send(input.validUser)
+        .end((err, res) => {
+          const { token } = res.body;
+          chai
+            .request(app)
+            .put(`/api/v1/entries/${cachedEntry.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send(entry.yesterdayStory)
+            .end((errr, result) => {
+              expect(result.status).to.equal(403);
+              clock.reset();
+              done();
+            });
+        });
+    });
+    // This is highly unlikely
+    it('It should return statusCode 422 when a user tries to UPDATE a story passing bad query', done => {
+      chai
+        .request(app)
+        .put(`/api/v1/entries/eee`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(422);
+          done();
+        });
+    });
+
+    it('It should return internal server error for a connection error to the database { Status 500 } ', done => {
+      const stub = sinon.stub(db, 'query').rejects();
+      chai
+        .request(app)
+        .put(`/api/v1/entries/${cachedEntry.id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(entry.validEntry)
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          stub.restore();
+          done();
+        });
+    });
+  });
 });
