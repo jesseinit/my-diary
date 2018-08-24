@@ -142,4 +142,52 @@ describe('My Diary Application', () => {
         });
     });
   });
+
+  // GET /entries
+  describe('When users tries to view all their diaries', () => {
+    it('It should return an error when the token header is not set { Status 403 } ', done => {
+      chai
+        .request(app)
+        .get('/api/v1/entries')
+        .end((err, res) => {
+          expect(res.status).to.equal(403);
+          done();
+        });
+    });
+
+    it('It should return an error when the token is invalid or expired { Status 401 }', done => {
+      chai
+        .request(app)
+        .get('/api/v1/entries')
+        .set('Authorization', `Bearer invalidToken`)
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          done();
+        });
+    });
+
+    it('It should return statusCode 404 when an authorised users have no diary entry', done => {
+      chai
+        .request(app)
+        .get('/api/v1/entries')
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          done();
+        });
+    });
+
+    it('It should return internal server error for a connection error to the database { Status 500 } ', done => {
+      const stub = sinon.stub(db, 'query').rejects();
+      chai
+        .request(app)
+        .get('/api/v1/entries')
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          stub.restore();
+          done();
+        });
+    });
+  });
 });
