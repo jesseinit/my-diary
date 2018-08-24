@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "description": "MyDiary is an online journal where users can pen down their thoughts and feelings.",
   "main": "server.js",
+  "engines": {
+    "node":"8.11.2"
+  },
   "keywords": [],
   "author": "Jesse Egbosoinu",
   "license": "ISC",
   "scripts": {
-    "build": "mkdir build && babel -d ./build ./server",
+    "build": "babel -d ./build ./server",
     "test": "nyc --reporter=text-summary mocha --exit --require babel-register",
     "start": "npm run build && node ./build/app",
     "dev": "nodemon --exec babel-node  -- ./server/app.js --env",
