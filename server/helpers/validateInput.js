@@ -1,4 +1,4 @@
-import { body, validationResult } from 'express-validator/check';
+import { body, param, validationResult } from 'express-validator/check';
 
 const signUp = [
   body('email')
@@ -22,6 +22,12 @@ const logIn = [
     .withMessage('Password should contain atleast 8 characters')
 ];
 
+const params = [
+  param('id')
+    .isInt({ min: 1 })
+    .withMessage('Invalid Parameter Passed')
+];
+
 const validationHandler = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -31,6 +37,6 @@ const validationHandler = (req, res, next) => {
   }
 };
 
-const validations = { signUp, logIn, validationHandler };
+const validations = { signUp, logIn, params, validationHandler };
 
 export default validations;

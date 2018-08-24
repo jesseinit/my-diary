@@ -3,7 +3,8 @@ import db from '../helpers/connection';
 const query = {
   getAll: 'SELECT * from diaries WHERE email = $1',
   saveDiary:
-    'INSERT INTO diaries (email,title,content) VALUES ($1, $2, $3) RETURNING *'
+    'INSERT INTO diaries (email,title,content) VALUES ($1, $2, $3) RETURNING *',
+  getOne: 'SELECT * from diaries WHERE email = $1 AND id = $2'
 };
 
 class Diary {
@@ -48,6 +49,31 @@ class Diary {
         res
           .status(201)
           .json({ message: 'Story Created', result: result.rows[0] });
+      })
+      .catch(error => {
+        res.status(500).json({ message: error });
+      });
+  }
+
+  /**
+   * @description Gets a specific diary
+   * @returns A single diary
+   * @static
+   * @param {*} req
+   * @param {*} res
+   * @memberof Diary
+   */
+  static getSelectedEntries(req, res) {
+    const { email } = req.authUser;
+    const { id } = req.params;
+
+    db.query(query.getOne, [email, id])
+      .then(result => {
+        if (result.rowCount) {
+          res.status(200).json(result.rows);
+        } else {
+          res.status(404).json({ message: 'No record found' });
+        }
       })
       .catch(error => {
         res.status(500).json({ message: error });

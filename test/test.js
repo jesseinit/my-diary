@@ -256,4 +256,74 @@ describe('My Diary Application', () => {
         });
     });
   });
+
+  // Get with Params
+  describe('When the user tries to view a specific diary', () => {
+    it('It should return - 403 - unauthorised access when a token is not sent', done => {
+      chai
+        .request(app)
+        .get(`/api/v1/entries/${cachedEntry.id}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(403);
+          done();
+        });
+    });
+
+    it('It should return - 401 - forbidden when token is expired or invalid', done => {
+      chai
+        .request(app)
+        .get(`/api/v1/entries/${cachedEntry.id}`)
+        .set('Authorization', `Bearer invalidToken`)
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          done();
+        });
+    });
+
+    it('It should return no diary entry to the user with - a status of 404', done => {
+      chai
+        .request(app)
+        .get(`/api/v1/entries/${cachedEntry.id + 1}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          done();
+        });
+    });
+
+    it('It should return the requested diary entry to the user with - a status of 200', done => {
+      chai
+        .request(app)
+        .get(`/api/v1/entries/${cachedEntry.id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          done();
+        });
+    });
+
+    it('It should return an error - Status 422 -  for an unprocessable query', done => {
+      chai
+        .request(app)
+        .get(`/api/v1/entries/eee}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(422);
+          done();
+        });
+    });
+
+    it('It should return internal server error for a connection error to the database { Status 500 } ', done => {
+      const stub = sinon.stub(db, 'query').rejects();
+      chai
+        .request(app)
+        .get(`/api/v1/entries/${cachedEntry.id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          stub.restore();
+          done();
+        });
+    });
+  });
 });
