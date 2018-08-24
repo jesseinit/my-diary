@@ -3,15 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const connectionString = {
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD
-};
-
-const pool = new pg.Pool(connectionString);
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 
 const usersTable = `CREATE TABLE IF NOT EXISTS users
 (
