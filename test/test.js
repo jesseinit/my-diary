@@ -3,7 +3,7 @@ import chaiHttp from 'chai-http';
 import sinon from 'sinon';
 import app from '../server/app';
 import db from '../server/helpers/connection';
-import { input } from './testData';
+import { input, entry } from './testData';
 
 const { expect } = chai;
 
@@ -11,6 +11,8 @@ chai.use(chaiHttp);
 
 // Cache the token
 let authToken = '';
+// Cache the entry
+let cachedEntry = '';
 
 describe('My Diary Application', () => {
   after(() => {
@@ -183,6 +185,70 @@ describe('My Diary Application', () => {
         .request(app)
         .get('/api/v1/entries')
         .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          stub.restore();
+          done();
+        });
+    });
+  });
+
+  // POST /entries
+  describe('When the user tries to create a new entry', () => {
+    it('It should return - 403 - unauthorised access when a token is not sent', done => {
+      chai
+        .request(app)
+        .post('/api/v1/entries')
+        .end((err, res) => {
+          expect(res.status).to.equal(403);
+          done();
+        });
+    });
+
+    it('It should return - 401 - forbidden when token is expired or invalid', done => {
+      chai
+        .request(app)
+        .post('/api/v1/entries')
+        .set('Authorization', `Bearer invalidToken`)
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          done();
+        });
+    });
+
+    it('It should return - 201 - and create an entry when user enter valid values', done => {
+      chai
+        .request(app)
+        .post('/api/v1/entries')
+        .set('Authorization', `Bearer ${authToken}`)
+        .set('Content-Type', 'application/json')
+        .send(entry.validEntry)
+        .end((err, res) => {
+          cachedEntry = res.body.result;
+          expect(res.status).to.equal(201);
+          done();
+        });
+    });
+
+    it('It should return - 200 - to confirm user have created a new diary entry', done => {
+      chai
+        .request(app)
+        .get('/api/v1/entries')
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          done();
+        });
+    });
+
+    it('It should return internal server error for a connection error to the database { Status 500 } ', done => {
+      const stub = sinon.stub(db, 'query').rejects();
+      chai
+        .request(app)
+        .post('/api/v1/entries')
+        .set('Authorization', `Bearer ${authToken}`)
+        .set('Content-Type', 'application/json')
+        .send(entry.validEntry)
         .end((err, res) => {
           expect(res.status).to.equal(500);
           stub.restore();
