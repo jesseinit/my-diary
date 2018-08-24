@@ -1,6 +1,7 @@
 import express from 'express';
 import diaries from '../config/db';
 import user from '../controller/userController';
+import diary from '../controller/diaryController';
 import helper from '../helpers';
 
 const router = express.Router();
@@ -19,9 +20,7 @@ router.post(
   user.logIn
 );
 
-router.get('/entries', (req, res) => {
-  res.status(200).send(diaries);
-});
+router.get('/entries', helper.verifyAuthToken, diary.getAllEntries);
 
 router.get('/entries/:id', (req, res) => {
   const diary = diaries.find(story => story.id === parseInt(req.params.id));
