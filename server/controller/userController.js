@@ -4,8 +4,7 @@ import db from '../helpers/connection';
 
 const query = {
   find: 'SELECT * FROM users WHERE email = $1',
-  regUser:
-    'INSERT INTO users (email,fullname,password) VALUES ( $1, $2, $3) RETURNING *'
+  regUser: 'INSERT INTO users (email,fullname,password) VALUES ( $1, $2, $3) RETURNING *'
 };
 
 class User {
@@ -28,18 +27,14 @@ class User {
           res.status(409).json({ message: 'Email address already taken' });
         } else {
           bcrypt.hash(password, 10).then(hashedPassword => {
-            db.query(query.regUser, [email, fullname, hashedPassword]).then(
-              userData => {
-                const token = jwt.sign(
-                  { email, memberSince: userData.rows.created_on },
-                  process.env.JWT_KEY,
-                  { expiresIn: '1h' }
-                );
-                res
-                  .status(201)
-                  .json({ message: 'Registration Successful', token });
-              }
-            );
+            db.query(query.regUser, [email, fullname, hashedPassword]).then(userData => {
+              const token = jwt.sign(
+                { email, memberSince: userData.rows.created_on },
+                process.env.JWT_KEY,
+                { expiresIn: '1h' }
+              );
+              res.status(201).json({ message: 'Registration Successful', token });
+            });
           });
         }
       })
@@ -73,15 +68,11 @@ class User {
               res.status(200).json({ message: 'Logged in successfuly', token });
             } else {
               // Password is Incorrect
-              res
-                .status(401)
-                .send({ message: 'Email or Password is not correct 😕' });
+              res.status(401).send({ message: 'Email or Password is not correct 😕' });
             }
           });
         } else {
-          res
-            .status(404)
-            .send({ message: 'Email or Password is not correct 😩' });
+          res.status(404).send({ message: 'Email or Password is not correct 😩' });
         }
       })
       .catch(error => {

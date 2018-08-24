@@ -12,7 +12,7 @@
   },
   "plugins": ["prettier"],
   "rules": {
-    "prettier/prettier": ["error", { "singleQuote": true }],
+    "prettier/prettier": ["error"],
     "no-unused-vars": ["error", { "varsIgnorePattern": "should|expect" }],
     "linebreak-style": 0,
     "comma-dangle": 0,
