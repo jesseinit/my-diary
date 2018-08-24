@@ -5,7 +5,8 @@ const query = {
   saveDiary: 'INSERT INTO diaries (email,title,content) VALUES ($1, $2, $3) RETURNING *',
   getOne: 'SELECT * from diaries WHERE email = $1 AND id = $2',
   updateOne:
-    'UPDATE diaries SET title = $1, content = $2, updated_on = $3 WHERE email = $4 AND id = $5 RETURNING updated_on'
+    'UPDATE diaries SET title = $1, content = $2, updated_on = $3 WHERE email = $4 AND id = $5 RETURNING updated_on',
+  deleteOne: 'DELETE FROM diaries WHERE email = $1 AND id = $2'
 };
 
 class Diary {
@@ -106,6 +107,30 @@ class Diary {
               res.status(200).json({ message: 'Story has been updated', updateData });
             });
           }
+        } else {
+          res.status(404).json({ message: 'Story not found' });
+        }
+      })
+      .catch(error => {
+        res.status(500).json({ message: error });
+      });
+  }
+
+  /**
+   * @description Deletes a specified dairy
+   *
+   * @static
+   * @param {*} req
+   * @param {*} res
+   * @memberof Diary
+   */
+  static deleteSelectedEntry(req, res) {
+    const { id } = req.params;
+    const { email } = req.authUser;
+    db.query(query.deleteOne, [email, id])
+      .then(result => {
+        if (result.rowCount) {
+          res.status(200).json({ message: 'Story has been deleted' });
         } else {
           res.status(404).json({ message: 'Story not found' });
         }
