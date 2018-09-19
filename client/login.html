@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./css/styles.css">
+  <title>Login - My Diary</title>
+</head>
+
+<body class="is__gradient">
+  
+    <header class="header">
+      <nav class="nav container">
+        <a href="./" class="nav-logo">My Diary</a>
+        <ul>
+          <li class="nav-menu-item">
+            <a href="./">Home</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="main container">
+      <section class="form">
+        <p class="form__header">Login with your account.</p>
+        <form id="login-form" class="form__login">
+          <ul class="error-container"></ul>
+          <div class="form__control">
+            <input type="email" id="login-email" class="form__input" placeholder="Email" required>
+          </div>
+          <div class="form__control">
+            <input type="password" id="login-password" class="form__input" placeholder="Password" required>
+          </div>
+          <div class="form__control">
+            <button type="submit" class="btn btn__primary">Login</button>
+          </div>
+          <span>Don't have a My Diary account?
+            <a href="./register.html">Sign Up</a>
+          </span>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>My Diary
+        <span>&copy;</span> 2018</p>
+    </footer>
+  <script src="./js/app.js"></script>
+</body>
+
+</html>

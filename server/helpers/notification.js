@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import dotenv from 'dotenv';
 import webpush from 'web-push';
 import { pool } from './connection';
@@ -26,4 +27,5 @@ const sendNotification = async () => {
   }
 };
 
+sendNotification();
 export default sendNotification;
