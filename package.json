@@ -4,7 +4,7 @@
   "description": "MyDiary is an online journal where users can pen down their thoughts and feelings.",
   "main": "server.js",
   "engines": {
-    "node":"8.11.2"
+    "node": "8.11.2"
   },
   "keywords": [],
   "author": "Jesse Egbosoinu",
@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "bcrypt": "^3.0.0",
+    "cors": "^2.8.4",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
     "express-validator": "^5.3.0",
