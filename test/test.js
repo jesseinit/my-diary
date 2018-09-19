@@ -456,13 +456,16 @@ describe('My Diary Application', () => {
 
   // DELETE
   describe('When the user tries to DELETE a specific diary', () => {
+    /* after(() => {
+      db.query('DROP TABLE users, diaries');
+    }); */
     // Test if token is set
-    it('It should return - 403 - unauthorised access when a token is not sent', done => {
+    it('It should return - 401 - unauthorised access when a token is not sent', done => {
       chai
         .request(app)
         .del(`/api/v1/entries/${cachedEntry.id}`)
         .end((err, res) => {
-          expect(res.status).to.equal(403);
+          expect(res.status).to.equal(401);
           done();
         });
     });
@@ -480,7 +483,7 @@ describe('My Diary Application', () => {
     });
 
     // Test for if the story exist
-    it('It should return statusCode 500 when a user tries to DELETE a story that exist', done => {
+    it('It should return statusCode 200 when a user tries to DELETE a story that exist', done => {
       chai
         .request(app)
         .del(`/api/v1/entries/${cachedEntry.id}`)
@@ -495,7 +498,7 @@ describe('My Diary Application', () => {
     it('It should return statusCode 404 when a user tries to DELETE a story that does not exist', done => {
       chai
         .request(app)
-        .del(`/api/v1/entries/${cachedEntry.id + 1}`)
+        .del(`/api/v1/entries/${cachedEntry.id + 2}`)
         .set('Authorization', `Bearer ${authToken}`)
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -515,7 +518,7 @@ describe('My Diary Application', () => {
     });
 
     it('It should return internal server error for a connection error to the database { Status 500 } ', done => {
-      const stub = sinon.stub(db, 'query').rejects();
+      const stub = sinon.stub(pool, 'query').callsFake(() => Promise.reject());
       chai
         .request(app)
         .del(`/api/v1/entries/${cachedEntry.id}`)
