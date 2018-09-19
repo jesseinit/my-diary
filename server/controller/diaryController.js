@@ -91,32 +91,35 @@ class Diary {
    * @param {*} res
    * @memberof Diary
    */
-  static updateSelectedEntry(req, res) {
-    const { email } = req.authUser;
-    const { id } = req.params;
-    const { title, content } = req.body;
-    const updated = new Date();
-
-    db.query(query.getOne, [email, id])
-      .then(result => {
-        if (result.rowCount) {
-          const dateCreated = new Date(result.rows[0].created_on).getTime();
-          const difference = (new Date().getTime() - dateCreated) / (1000 * 60 * 60);
-
-          if (difference > 24) {
-            res.status(403).json({ message: 'Story is too old' });
-          } else {
-            db.query(query.updateOne, [title, content, updated, email, id]).then(updateData => {
-              res.status(200).json({ message: 'Story has been updated', updateData });
-            });
-          }
+  static async updateSelectedEntry(req, res, next) {
+    try {
+      const { email } = req.authUser;
+      const { id } = req.params;
+      const { title, content } = req.body;
+      const updated = new Date();
+      const result = await pool.query(query.getOne, [email, id]);
+      if (result.rowCount) {
+        const dateCreated = new Date(result.rows[0].created_on).getTime();
+        const difference = (new Date().getTime() - dateCreated) / (1000 * 60 * 60);
+        if (difference > 24) {
+          res.status(403).json({ message: 'Story is too old' });
         } else {
-          res.status(404).json({ message: 'Story not found' });
+          const updateData = await pool.query(query.updateOne, [
+            title,
+            content,
+            updated,
+            email,
+            id
+          ]);
+          res.status(200).json({ message: 'Story has been updated', data: updateData.rows[0] });
         }
-      })
-      .catch(error => {
-        res.status(500).json({ message: error });
-      });
+      } else {
+        res.status(404).json({ message: 'Story not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error });
+      next(error);
+    }
   }
 
   /**
