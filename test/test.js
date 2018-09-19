@@ -144,12 +144,12 @@ describe('My Diary Application', () => {
 
   // GET /entries
   describe('When users tries to view all their diaries', () => {
-    it('It should return an error when the token header is not set { Status 403 } ', done => {
+    it('It should return an error when the token header is not set { Status 401 } ', done => {
       chai
         .request(app)
         .get('/api/v1/entries')
         .end((err, res) => {
-          expect(res.status).to.equal(403);
+          expect(res.status).to.equal(401);
           done();
         });
     });
@@ -165,19 +165,19 @@ describe('My Diary Application', () => {
         });
     });
 
-    it('It should return statusCode 404 when an authorised users have no diary entry', done => {
+    it('It should return statusCode 200 when an authorised users have no diary entry', done => {
       chai
         .request(app)
         .get('/api/v1/entries')
         .set('Authorization', `Bearer ${authToken}`)
         .end((err, res) => {
-          expect(res.status).to.equal(404);
+          expect(res.status).to.equal(200);
           done();
         });
     });
 
     it('It should return internal server error for a connection error to the database { Status 500 } ', done => {
-      const stub = sinon.stub(db, 'query').rejects();
+      const stub = sinon.stub(pool, 'query').callsFake(() => Promise.reject());
       chai
         .request(app)
         .get('/api/v1/entries')
