@@ -92,6 +92,29 @@ class User {
       next(error);
     }
   }
+
+  /**
+   * @description Updates the user profile information when they navigate to their profile page
+   * @returns Reminder State and PushSubscription Object (Stored in JSON format)
+   * @static
+   * @param {*} req
+   * @param {*} res
+   * @param {*} next
+   * @memberof User
+   */
+  static async updateProfile(req, res, next) {
+    try {
+      const { email } = req.authUser;
+      const { reminder, pushSubscription } = req.body;
+      const user = await pool.query(query.updateUser, [reminder, pushSubscription, email]);
+      res
+        .status(200)
+        .json({ reminder: user.rows[0].reminder, subscription: user.rows[0].push_sub });
+    } catch (error) {
+      res.status(500).json({ message: error });
+      next();
+    }
+  }
 }
 
 export default User;
