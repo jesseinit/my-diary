@@ -11,7 +11,9 @@ const usersTable = `CREATE TABLE IF NOT EXISTS users
   email VARCHAR (100) UNIQUE NOT NULL,
   fullname VARCHAR (255) NOT NULL,
   password VARCHAR (255) NOT NULL,
-  created_on TIMESTAMPTZ DEFAULT now() NOT NULL
+  created_on TIMESTAMPTZ DEFAULT now() NOT NULL,
+  push_sub JSON,
+  reminder boolean DEFAULT FALSE NOT NULL
 );`;
 
 const dairiesTable = `CREATE TABLE IF NOT EXISTS diaries 
@@ -24,6 +26,5 @@ const dairiesTable = `CREATE TABLE IF NOT EXISTS diaries
   updated_on TIMESTAMPTZ DEFAULT now() NOT NULL
 );`;
 
-pool.query(`${usersTable} ${dairiesTable}`);
-
-export default pool;
+const setupDbTables = () => pool.query(`${usersTable} ${dairiesTable}`);
+export { pool, setupDbTables };
