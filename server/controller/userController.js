@@ -11,6 +11,7 @@ class User {
    * @static
    * @param {*} req
    * @param {*} res
+   * @param {*} next
    * @memberof User
    */
   static async signUp(req, res, next) {
@@ -32,40 +33,36 @@ class User {
   }
 
   /**
-   * Login a user
-   *
+   * @description Loging users after they have provided correct credntials
+   * @returns A token that signs/encodes the user's email
    * @static
    * @param {*} req
    * @param {*} res
+   * @param {*} next
    * @memberof User
    */
-  static logIn(req, res) {
-    const email = req.body.email.toLowerCase();
-    const { password } = req.body;
-    db.query(query.find, [email])
-      .then(userData => {
-        if (userData.rowCount) {
-          bcrypt.compare(password, userData.rows[0].password).then(result => {
-            if (result) {
-              // Password is Correct
-              const token = jwt.sign(
-                { email, memberSince: userData.rows[0].created_on },
-                process.env.JWT_KEY,
-                { expiresIn: '1h' }
-              );
-              res.status(200).json({ message: 'Logged in successfuly', token });
-            } else {
-              // Password is Incorrect
-              res.status(401).send({ message: 'Email or Password is not correct 😕' });
-            }
-          });
-        } else {
-          res.status(404).send({ message: 'Email or Password is not correct 😩' });
-        }
-      })
-      .catch(error => {
-        res.status(500).json({ message: error });
-      });
+  static async logIn(req, res, next) {
+    try {
+      const email = req.body.email.toLowerCase();
+      const { password } = req.body;
+      const usersFound = await pool.query(query.find, [email]);
+      if (usersFound.rows.length < 1) {
+        res.status(404).send({ message: 'No associated account with that email. 😩' });
+        return;
+      }
+      const isPasswordValid = await bcrypt.compare(password, usersFound.rows[0].password);
+      if (isPasswordValid) {
+        const token = jwt.sign({ email: usersFound.rows[0].email }, SECRET_KEY, {
+          expiresIn: '1h'
+        });
+        res.status(200).json({ message: 'Logged in successfuly', token });
+      } else {
+        res.status(401).send({ message: 'Email or Password is not correct 😕' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error });
+      next(error);
+    }
   }
 }
 
