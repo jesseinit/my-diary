@@ -287,12 +287,12 @@ describe('My Diary Application', () => {
 
   // Get with Params
   describe('When the user tries to view a specific diary', () => {
-    it('It should return - 403 - unauthorised access when a token is not sent', done => {
+    it('It should return - 401 - unauthorised access when a token is not sent', done => {
       chai
         .request(app)
         .get(`/api/v1/entries/${cachedEntry.id}`)
         .end((err, res) => {
-          expect(res.status).to.equal(403);
+          expect(res.status).to.equal(401);
           done();
         });
     });
@@ -311,7 +311,7 @@ describe('My Diary Application', () => {
     it('It should return no diary entry to the user with - a status of 404', done => {
       chai
         .request(app)
-        .get(`/api/v1/entries/${cachedEntry.id + 1}`)
+        .get(`/api/v1/entries/${cachedEntry.id + 2}`)
         .set('Authorization', `Bearer ${authToken}`)
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -342,7 +342,7 @@ describe('My Diary Application', () => {
     });
 
     it('It should return internal server error for a connection error to the database { Status 500 } ', done => {
-      const stub = sinon.stub(db, 'query').rejects();
+      const stub = sinon.stub(pool, 'query').callsFake(() => Promise.reject());
       chai
         .request(app)
         .get(`/api/v1/entries/${cachedEntry.id}`)
