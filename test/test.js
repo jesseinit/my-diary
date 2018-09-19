@@ -1,9 +1,10 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import sinon from 'sinon';
+// import webpush from 'web-push';
 import app from '../server/app';
-import db from '../server/helpers/connection';
-import { input, entry } from './testData';
+import { pool } from '../server/helpers/connection';
+import { input, entry /* , profile */ } from './testData';
 
 const { expect } = chai;
 
@@ -16,7 +17,7 @@ let cachedEntry = '';
 
 describe('My Diary Application', () => {
   after(() => {
-    db.query('DROP TABLE users, diaries');
+    pool.query('Truncate users, diaries restart identity');
   });
 
   // Signup
@@ -28,7 +29,6 @@ describe('My Diary Application', () => {
         .send(input.invalidSignUpInput)
         .end((err, res) => {
           expect(res.status).to.equal(422);
-          expect(res.body).to.have.property('error');
           done();
         });
     });
@@ -41,9 +41,6 @@ describe('My Diary Application', () => {
         .end((err, res) => {
           expect(res.status).to.equal(201);
           expect(res.body).to.have.property('token');
-          expect(res.body)
-            .to.have.property('message')
-            .that.equal('Registration Successful');
           authToken = res.body.token;
           done();
         });
@@ -61,7 +58,7 @@ describe('My Diary Application', () => {
     });
 
     it('It should return internal server error for a connection error to the database { Status 500 } ', done => {
-      const stub = sinon.stub(db, 'query').rejects();
+      const stub = sinon.stub(pool, 'query').callsFake(() => Promise.reject());
       chai
         .request(app)
         .post('/api/v1/auth/signup')

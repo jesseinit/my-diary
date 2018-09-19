@@ -51,4 +51,8 @@ const entry = {
   }
 };
 
-export { input, entry };
+const profile = {
+  details: { reminder: true, pushSubscription: null }
+};
+
+export { input, entry, profile };
