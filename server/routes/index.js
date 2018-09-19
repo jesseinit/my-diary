@@ -1,6 +1,6 @@
 import express from 'express';
-import user from '../controller/userController';
-import diary from '../controller/diaryController';
+import User from '../controller/userController';
+import Dairy from '../controller/diaryController';
 import helper from '../helpers';
 
 const router = express.Router();
@@ -9,34 +9,40 @@ router.post(
   '/auth/signup',
   helper.validateInput.signUp,
   helper.validateInput.validationHandler,
-  user.signUp
+  User.signUp
 );
 
 router.post(
   '/auth/login',
   helper.validateInput.logIn,
   helper.validateInput.validationHandler,
-  user.logIn
+  User.logIn
 );
 
-router.get('/entries', helper.verifyAuthToken, diary.getAllEntries);
+router.get('/entries/', helper.verifyAuthToken, Dairy.getAllEntries);
+
+router.post(
+  '/entries',
+  helper.verifyAuthToken,
+  helper.validateInput.post,
+  helper.validateInput.validationHandler,
+  Dairy.createNewEntry
+);
 
 router.get(
   '/entries/:id',
   helper.verifyAuthToken,
   helper.validateInput.params,
   helper.validateInput.validationHandler,
-  diary.getSelectedEntries
+  Dairy.getSelectedEntries
 );
-
-router.post('/entries', helper.verifyAuthToken, diary.createNewEntry);
 
 router.put(
   '/entries/:id',
   helper.verifyAuthToken,
   helper.validateInput.params,
   helper.validateInput.validationHandler,
-  diary.updateSelectedEntry
+  Dairy.updateSelectedEntry
 );
 
 router.delete(
@@ -44,7 +50,10 @@ router.delete(
   helper.verifyAuthToken,
   helper.validateInput.params,
   helper.validateInput.validationHandler,
-  diary.deleteSelectedEntry
+  Dairy.deleteSelectedEntry
 );
+
+router.get('/profile/', helper.verifyAuthToken, User.getProfile);
+router.put('/profile/', helper.verifyAuthToken, User.updateProfile);
 
 export default router;

@@ -3,6 +3,7 @@ import { body, param, validationResult } from 'express-validator/check';
 const signUp = [
   body('email')
     .isEmail()
+    .isLength({ max: 100 })
     .withMessage('Please enter a valid email'),
   body('fullname')
     .isString()
@@ -16,10 +17,11 @@ const signUp = [
 const logIn = [
   body('email')
     .isEmail()
+    .isLength({ max: 100 })
     .withMessage('Please enter a valid email'),
   body('password')
     .isLength({ min: 6 })
-    .withMessage('Password should contain atleast 8 characters')
+    .withMessage('Password should contain atleast 6 characters')
 ];
 
 const params = [
@@ -28,15 +30,21 @@ const params = [
     .withMessage('Invalid Parameter Passed')
 ];
 
+const post = [
+  body('title')
+    .isLength({ max: 100 })
+    .withMessage('Title should not exceed 100 Characters')
+];
+
 const validationHandler = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.status(422).json({ error: errors.array().map(error => error.msg) });
+    res.status(422).json({ message: errors.array().map(error => error.msg) });
   } else {
     next();
   }
 };
 
-const validations = { signUp, logIn, params, validationHandler };
+const validations = { signUp, logIn, params, post, validationHandler };
 
 export default validations;

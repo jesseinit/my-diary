@@ -18,9 +18,9 @@ let cachedEntry = '';
 
 describe('My Diary Application', () => {
   after(() => {
-    pool.query('Truncate users, diaries restart identity');
+    // pool.query('Truncate users, diaries restart identity');
+    pool.query('drop table users,diaries');
   });
-
   // Signup
   describe('When the user tries to signup an account', () => {
     it('It should return an error for an unprocessable input { Status 422 }', done => {
@@ -71,6 +71,7 @@ describe('My Diary Application', () => {
         });
     });
   });
+
   // Login
   describe('When the user tries to login into their account', () => {
     it('It should return an error for an unprocessable input { Status 422 }', done => {
@@ -457,9 +458,6 @@ describe('My Diary Application', () => {
 
   // DELETE
   describe('When the user tries to DELETE a specific diary', () => {
-    /* after(() => {
-      db.query('DROP TABLE users, diaries');
-    }); */
     // Test if token is set
     it('It should return - 401 - unauthorised access when a token is not sent', done => {
       chai
@@ -531,6 +529,7 @@ describe('My Diary Application', () => {
         });
     });
   });
+
   // PROFILE
   describe('When the user tries to Navigates to their Profile Page', () => {
     it('They should be able to see their Profile information', done => {
