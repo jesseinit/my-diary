@@ -46,17 +46,17 @@ class Diary {
    * @param {*} res
    * @memberof Diary
    */
-  static createNewEntry(req, res) {
-    const { title, content } = req.body;
-    const { email } = req.authUser;
-
-    db.query(query.saveDiary, [email, title, content])
-      .then(result => {
-        res.status(201).json({ message: 'Story Created', result: result.rows[0] });
-      })
-      .catch(error => {
-        res.status(500).json({ message: error });
-      });
+  static async createNewEntry(req, res, next) {
+    try {
+      const { email } = req.authUser;
+      const title = req.body.title || 'Untitled Diary';
+      const content = req.body.content || 'Empty content';
+      const result = await pool.query(query.saveDiary, [email, title, content]);
+      res.status(201).json({ message: 'Story Created', result: result.rows[0] });
+    } catch (error) {
+      res.status(500).json({ message: error });
+      next(error);
+    }
   }
 
   /**
