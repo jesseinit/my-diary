@@ -192,12 +192,12 @@ describe('My Diary Application', () => {
 
   // POST /entries
   describe('When the user tries to create a new entry', () => {
-    it('It should return - 403 - unauthorised access when a token is not sent', done => {
+    it('It should return - 401 - unauthorised access when a token is not sent', done => {
       chai
         .request(app)
         .post('/api/v1/entries')
         .end((err, res) => {
-          expect(res.status).to.equal(403);
+          expect(res.status).to.equal(401);
           done();
         });
     });
@@ -227,7 +227,7 @@ describe('My Diary Application', () => {
         });
     });
 
-    it('It should return - 200 - to confirm user have created a new diary entry', done => {
+    it('It should return statusCode 200 to confirm the saved entry', done => {
       chai
         .request(app)
         .get('/api/v1/entries')
@@ -238,8 +238,39 @@ describe('My Diary Application', () => {
         });
     });
 
+    it('It should return statusCode 200 when an authorised users have no diary entry', done => {
+      chai
+        .request(app)
+        .post('/api/v1/entries')
+        .set('Authorization', `Bearer ${authToken}`)
+        .set('Content-Type', 'application/json')
+        .send(entry.validEntry)
+        .end((err, res) => {
+          expect(res.status).to.equal(201);
+          chai
+            .request(app)
+            .get('/api/v1/entries?id=2')
+            .set('Authorization', `Bearer ${authToken}`)
+            .end((err1, res1) => {
+              expect(res1.status).to.equal(200);
+              done();
+            });
+        });
+    });
+
+    it('It should return statusCode 200 when an authorised users tries to fetch more diary entry', done => {
+      chai
+        .request(app)
+        .get('/api/v1/entries?id=1')
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          done();
+        });
+    });
+
     it('It should return internal server error for a connection error to the database { Status 500 } ', done => {
-      const stub = sinon.stub(db, 'query').rejects();
+      const stub = sinon.stub(pool, 'query').callsFake(() => Promise.reject());
       chai
         .request(app)
         .post('/api/v1/entries')
