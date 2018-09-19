@@ -65,6 +65,33 @@ class User {
       next(error);
     }
   }
+
+  /**
+   * @description Gets the user profile information when they navigate to their profile page
+   * @returns User Fullname,Reminder preference, PostCount and Date of Registration
+   * @static
+   * @param {*} req
+   * @param {*} res
+   * @param {*} next
+   * @memberof User
+   */
+  static async getProfile(req, res, next) {
+    try {
+      const { email } = req.authUser;
+      const usersDetails = await pool.query(query.find, [email]);
+      const postCount = await pool.query(query.getPostCount, [email]);
+      const { fullname, reminder } = usersDetails.rows[0];
+      res.status(200).json({
+        fullname,
+        reminder,
+        postCount: postCount.rowCount,
+        memberSince: usersDetails.rows[0].created_on
+      });
+    } catch (error) {
+      res.status(500).json({ message: error });
+      next(error);
+    }
+  }
 }
 
 export default User;
