@@ -1,10 +1,11 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import sinon from 'sinon';
-// import webpush from 'web-push';
+import webpush from 'web-push';
 import app from '../server/app';
 import { pool } from '../server/helpers/connection';
-import { input, entry /* , profile */ } from './testData';
+import sendNotification from '../server/helpers/notification';
+import { input, entry, profile } from './testData';
 
 const { expect } = chai;
 
@@ -528,6 +529,79 @@ describe('My Diary Application', () => {
           stub.restore();
           done();
         });
+    });
+  });
+  // PROFILE
+  describe('When the user tries to Navigates to their Profile Page', () => {
+    it('They should be able to see their Profile information', done => {
+      chai
+        .request(app)
+        .get(`/api/v1/profile`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          done();
+        });
+    });
+    it('It should return internal server error when user tries to fetch profile due to DB connection error', done => {
+      const stub = sinon.stub(pool, 'query').callsFake(() => Promise.reject());
+      chai
+        .request(app)
+        .get(`/api/v1/profile`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          stub.restore();
+          done();
+        });
+    });
+    it('It should return internal server error when user tries to fetch profile due to DB connection error', done => {
+      const stub = sinon.stub(pool, 'query').callsFake(() => Promise.reject());
+      chai
+        .request(app)
+        .put(`/api/v1/profile`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          stub.restore();
+          done();
+        });
+    });
+    it('They should be able to Update their Profile information', done => {
+      chai
+        .request(app)
+        .put(`/api/v1/profile`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(profile.details)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          done();
+        });
+    });
+
+    it('It should send notification when all there is no error from DB', async () => {
+      const stub = sinon.stub(webpush, 'sendNotification');
+      stub.resolves();
+      await sendNotification();
+      expect(stub.called).to.be.eql(true);
+      stub.restore();
+    });
+
+    it('It should NOT send notification when theres and error from the DB', async () => {
+      const stub = sinon.stub(pool, 'query').callsFake(() => Promise.reject());
+      const spy = sinon.spy(webpush, 'sendNotification');
+      await sendNotification();
+      expect(spy.called).to.be.eql(false);
+      stub.restore();
+      spy.restore();
+    });
+
+    it('It should NOT send notification when there is no user with subscription', async () => {
+      pool.query('UPDATE users SET reminder = $1, push_sub = $2 RETURNING reminder', [false, null]);
+      const spy = sinon.spy(webpush, 'sendNotification');
+      await sendNotification();
+      expect(spy.called).to.be.eql(false);
+      spy.restore();
     });
   });
 });
