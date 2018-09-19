@@ -79,7 +79,6 @@ describe('My Diary Application', () => {
         .send(input.invalidLoginInput)
         .end((err, res) => {
           expect(res.status).to.equal(422);
-          expect(res.body).to.have.property('error');
           done();
         });
     });
@@ -101,6 +100,7 @@ describe('My Diary Application', () => {
         .post('/api/v1/auth/login')
         .send(input.validUser)
         .end((err, res) => {
+          expect(res.status).to.equal(200);
           expect(res.body).to.have.property('token');
           done();
         });
@@ -129,7 +129,7 @@ describe('My Diary Application', () => {
     });
 
     it('It should return internal server error for a connection error to the database { Status 500 } ', done => {
-      const stub = sinon.stub(db, 'query').rejects();
+      const stub = sinon.stub(pool, 'query').callsFake(() => Promise.reject());
       chai
         .request(app)
         .post('/api/v1/auth/login')
