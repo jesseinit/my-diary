@@ -130,20 +130,20 @@ class Diary {
    * @param {*} res
    * @memberof Diary
    */
-  static deleteSelectedEntry(req, res) {
-    const { id } = req.params;
-    const { email } = req.authUser;
-    db.query(query.deleteOne, [email, id])
-      .then(result => {
-        if (result.rowCount) {
-          res.status(200).json({ message: 'Story has been deleted' });
-        } else {
-          res.status(404).json({ message: 'Story not found' });
-        }
-      })
-      .catch(error => {
-        res.status(500).json({ message: error });
-      });
+  static async deleteSelectedEntry(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { email } = req.authUser;
+      const result = await pool.query(query.deleteOne, [email, id]);
+      if (result.rowCount) {
+        res.status(200).json({ message: 'Story has been deleted' });
+      } else {
+        res.status(404).json({ message: 'Story not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error });
+      next(error);
+    }
   }
 }
 
