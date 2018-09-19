@@ -1,12 +1,9 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import db from '../helpers/connection';
+import { pool } from '../helpers/connection';
+import query from '../helpers/queries';
 
-const query = {
-  find: 'SELECT * FROM users WHERE email = $1',
-  regUser: 'INSERT INTO users (email,fullname,password) VALUES ( $1, $2, $3) RETURNING *'
-};
-
+const SECRET_KEY = process.env.JWT_KEY;
 class User {
   /**
    * @description Creates a user for the application
@@ -16,31 +13,22 @@ class User {
    * @param {*} res
    * @memberof User
    */
-  static signUp(req, res) {
-    const { email, fullname, password } = req.body;
-
-    // Checks to see if the user has been registered
-    db.query(query.find, [email])
-      .then(result => {
-        if (result.rowCount) {
-          // Return if the email has been used
-          res.status(409).json({ message: 'Email address already taken' });
-        } else {
-          bcrypt.hash(password, 10).then(hashedPassword => {
-            db.query(query.regUser, [email, fullname, hashedPassword]).then(userData => {
-              const token = jwt.sign(
-                { email, memberSince: userData.rows.created_on },
-                process.env.JWT_KEY,
-                { expiresIn: '1h' }
-              );
-              res.status(201).json({ message: 'Registration Successful', token });
-            });
-          });
-        }
-      })
-      .catch(error => {
-        res.status(500).json({ message: error });
-      });
+  static async signUp(req, res, next) {
+    try {
+      const { email, fullname, password } = req.body;
+      const usersFound = await pool.query(query.find, [email]);
+      if (usersFound.rowCount > 0) {
+        res.status(409).json({ message: 'Email address already taken' });
+        return;
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = await pool.query(query.regUser, [email, fullname, hashedPassword]);
+      const token = jwt.sign({ email: newUser.rows[0].email }, SECRET_KEY, { expiresIn: '1h' });
+      res.status(201).json({ message: 'Registration Successful', token });
+    } catch (error) {
+      res.status(500).json({ message: error });
+      next(error);
+    }
   }
 
   /**
