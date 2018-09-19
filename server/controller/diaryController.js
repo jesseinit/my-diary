@@ -67,21 +67,20 @@ class Diary {
    * @param {*} res
    * @memberof Diary
    */
-  static getSelectedEntries(req, res) {
-    const { email } = req.authUser;
-    const { id } = req.params;
-
-    db.query(query.getOne, [email, id])
-      .then(result => {
-        if (result.rowCount) {
-          res.status(200).json(result.rows);
-        } else {
-          res.status(404).json({ message: 'No record found' });
-        }
-      })
-      .catch(error => {
-        res.status(500).json({ message: error });
-      });
+  static async getSelectedEntries(req, res, next) {
+    try {
+      const { email } = req.authUser;
+      const { id } = req.params;
+      const diary = await pool.query(query.getOne, [email, id]);
+      if (diary.rowCount) {
+        res.status(200).json(diary.rows[0]);
+      } else {
+        res.status(404).json({ message: 'No diary to display' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error });
+      next(error);
+    }
   }
 
   /**
