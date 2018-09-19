@@ -1,37 +1,41 @@
-import db from '../helpers/connection';
-
-const query = {
-  getAll: 'SELECT * from diaries WHERE email = $1',
-  saveDiary: 'INSERT INTO diaries (email,title,content) VALUES ($1, $2, $3) RETURNING *',
-  getOne: 'SELECT * from diaries WHERE email = $1 AND id = $2',
-  updateOne:
-    'UPDATE diaries SET title = $1, content = $2, updated_on = $3 WHERE email = $4 AND id = $5 RETURNING updated_on',
-  deleteOne: 'DELETE FROM diaries WHERE email = $1 AND id = $2'
-};
+import 'babel-polyfill';
+import { pool } from '../helpers/connection';
+import query from '../helpers/queries';
 
 class Diary {
   /**
-   *@description Fetches all the users diaries
+   * @description Fetches all the users diaries
    * @returns All user's diaries
    * @static
    * @param {*} req
    * @param {*} res
    * @memberof Diary
    */
-  static getAllEntries(req, res) {
-    const { email } = req.authUser;
-
-    db.query(query.getAll, [email])
-      .then(results => {
-        if (results.rowCount) {
-          res.status(200).json(results.rows);
+  static async getAllEntries(req, res, next) {
+    try {
+      const { email } = req.authUser;
+      if (typeof req.query.id === 'undefined') {
+        const diaries = await pool.query(query.getAll, [email]);
+        if (diaries.rowCount > 0) {
+          res.status(200).json(diaries.rows);
         } else {
-          res.status(404).json({ message: 'No record found' });
+          res.status(200).json({ message: 'No diary to display' });
         }
-      })
-      .catch(error => {
-        res.status(500).json({ message: error });
-      });
+        return;
+      }
+      if (req.query.id !== 'null') {
+        const moreDiaries = await pool.query(query.getMore, [email, req.query.id]);
+        if (moreDiaries.rowCount > 0) {
+          res.status(200).json(moreDiaries.rows);
+        } else {
+          res.status(200).json({ message: 'You have reached the end' });
+        }
+        return;
+      }
+    } catch (error) {
+      res.status(500).json({ message: error });
+      next(error);
+    }
   }
 
   /**
