@@ -14,23 +14,20 @@ class Diary {
   static async getAllEntries(req, res, next) {
     try {
       const { email } = req.authUser;
-      if (typeof req.query.id === 'undefined') {
-        const diaries = await pool.query(query.getAll, [email]);
-        if (diaries.rowCount > 0) {
-          res.status(200).json(diaries.rows);
-        } else {
-          res.status(200).json({ message: 'No diary to display' });
-        }
-        return;
-      }
-      if (req.query.id !== 'null') {
+      if (req.query.id) {
         const moreDiaries = await pool.query(query.getMore, [email, req.query.id]);
         if (moreDiaries.rowCount > 0) {
           res.status(200).json(moreDiaries.rows);
-        } else {
-          res.status(200).json({ message: 'You have reached the end' });
+          return;
         }
-        return;
+        res.status(200).json({ message: 'You have reached the end' });
+      } else {
+        const diaries = await pool.query(query.getAll, [email]);
+        if (diaries.rowCount > 0) {
+          res.status(200).json(diaries.rows);
+          return;
+        }
+        res.status(200).json({ message: 'No diary to display' });
       }
     } catch (error) {
       res.status(500).json({ message: error });

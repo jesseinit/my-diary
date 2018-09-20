@@ -6,7 +6,8 @@ const errContainer = document.querySelector('.error-container');
 const logoutBtn = document.querySelector('#logout');
 const deleteStoryBtn = document.querySelector('.delete-confirm');
 const notification = document.querySelector('.profile__setting input');
-const publicVapid = 'BM045LgB8vOm-HPga83qiFrUuCFaILe8ymx25HeBbyPB9eGiMnx7ljH6GJ5JVsyEXiBLq5j4OdoGClE-4ZhUW_M';
+const publicVapid =
+  'BM045LgB8vOm-HPga83qiFrUuCFaILe8ymx25HeBbyPB9eGiMnx7ljH6GJ5JVsyEXiBLq5j4OdoGClE-4ZhUW_M';
 
 /* UTILITY FUNCTIONS */
 // Success Toast
@@ -55,9 +56,16 @@ const fetchRequest = async (url = '', method = 'GET', body = null) => {
     body,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
   })
-    .then(res => (res.ok ? res.json() : Promise.reject({ status: res.status, statusText: res.statusText })) /*  */) // "prefer-promise-reject-errors":"off",
+    .then(
+      res =>
+        res.ok
+          ? res.json()
+          : Promise.reject({ status: res.status, statusText: res.statusText }) /*  */
+    ) // "prefer-promise-reject-errors":"off",
     .then(response => response)
-    .catch(error => error /* Perform a Switch with error.status, there throw the respective toast */);
+    .catch(
+      error => error /* Perform a Switch with error.status, there throw the respective toast */
+    );
 };
 
 // Check Token Validity
@@ -74,10 +82,8 @@ const isLoggedIn = async () => {
 const urlBase64ToUint8Array = base64String => {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-
   const rawData = window.atob(base64);
   const outputArray = new Uint8Array(rawData.length);
-
   for (let i = 0; i < rawData.length; i += 1) {
     outputArray[i] = rawData.charCodeAt(i);
   }
@@ -90,18 +96,13 @@ const urlBase64ToUint8Array = base64String => {
 const updateStory = async e => {
   try {
     e.preventDefault();
-
     isLoggedIn();
-
     // Get Story ID from URL
     const storyID = new URLSearchParams(window.location.search).get('id');
-
     // Update Story Endpoint URL
     const updateEndpoint = `/api/v1/entries/${storyID}`;
-
     const storyTitle = document.querySelector('.view-card-title');
     const storyContent = document.querySelector('.view-card-body');
-
     if (e.target.textContent === 'Edit Story') {
       e.target.textContent = 'Save Update';
       storyTitle.focus();
@@ -115,14 +116,15 @@ const updateStory = async e => {
       storyTitle.classList.remove('edit-mode');
       storyContent.classList.remove('edit-mode');
       e.target.textContent = 'Edit Story';
-      // Grab our form input values
-      const updateData = JSON.stringify({ title: storyTitle.textContent, content: storyContent.textContent });
+      const updateData = JSON.stringify({
+        title: storyTitle.textContent,
+        content: storyContent.textContent
+      });
       await fetchRequest(updateEndpoint, 'PUT', updateData);
-      // toastSuccess()
       toast('Story Has Been Updated', toastSuccess, 3000);
     }
   } catch (error) {
-    // toastFailure();
+    toast('Error Updating Story', toastErr, 3000);
   }
 };
 
@@ -134,9 +136,7 @@ const deleteStory = async e => {
     isLoggedIn();
     const requestURL = `/api/v1/entries/${storyID}`;
     await fetchRequest(requestURL, 'DELETE');
-    // toastSuccess('Message Deleted');
     toast('Message Deleted', toastSuccess);
-    // Disable Both Button
     setTimeout(() => {
       window.location.replace('./dashboard.html');
     }, 1000);
@@ -160,7 +160,11 @@ const loadStories = async () => {
       const cardTitle = createNode('p', 'diary-card-title', diary.title);
       const cardBody = createNode('p', 'diary-card-body', diary.content);
       const cardInfo = createNode('div', 'diary-card-info');
-      const cardDate = createNode('span', 'diary-card-date', new Date(diary.created_on).toDateString());
+      const cardDate = createNode(
+        'span',
+        'diary-card-date',
+        new Date(diary.created_on).toDateString()
+      );
       const cardView = createNode('span', 'diary-card-view');
       const cardLink = createNode('a', '', 'Read Story');
       cardLink.setAttribute('href', `./view-story.html?id=${diary.id}`);
@@ -198,7 +202,11 @@ const viewStory = async () => {
     const difference = (new Date().getTime() - dateCreated) / (1000 * 60 * 60);
 
     const cardTitle = createNode('p', 'view-card-title', response.title);
-    const cardDate = createNode('span', 'view-card-date', new Date(response.created_on).toDateString());
+    const cardDate = createNode(
+      'span',
+      'view-card-date',
+      new Date(response.created_on).toDateString()
+    );
     const cardBody = createNode('p', 'view-card-body', response.content);
     const cardAction = createNode('span', 'view-card-actions');
     const cardDelete = createNode('a', 'view-del-btn', 'Delete Story');
@@ -545,7 +553,11 @@ window.addEventListener('scroll', async () => {
         const cardTitle = createNode('p', 'diary-card-title', diary.title);
         const cardBody = createNode('p', 'diary-card-body', diary.content);
         const cardInfo = createNode('div', 'diary-card-info');
-        const cardDate = createNode('span', 'diary-card-date', new Date(diary.created_on).toDateString());
+        const cardDate = createNode(
+          'span',
+          'diary-card-date',
+          new Date(diary.created_on).toDateString()
+        );
         const cardView = createNode('span', 'diary-card-view');
         const cardLink = createNode('a', '', 'Read Story');
         cardLink.setAttribute('href', `./view-story.html?id=${diary.id}`);
