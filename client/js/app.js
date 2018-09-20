@@ -180,22 +180,27 @@ const loadStories = async () => {
 };
 
 const inifiteScroll = () => {
-  window.addEventListener('scroll', async () => {
-    if (window.innerHeight + window.scrollY >= document.body.scrollHeight) {
-      const id = storyWrapper.lastChild.getAttribute('data-id');
-      const url = `api/v1/entries?id=${id}`;
-      const response = await fetchRequest(url);
-      if (response.message) {
-        const message = createNode('p', 'diary-message', response.message);
-        storyWrapper.appendChild(message);
-      } else {
-        response.forEach(diary => {
-          createCards(diary);
-        });
-        addCardListenter();
+  let atLastPost = false;
+  if (atLastPost === false) {
+    window.addEventListener('scroll', async () => {
+      if (window.innerHeight + window.scrollY >= document.body.scrollHeight) {
+        const id = storyWrapper.lastChild.getAttribute('data-id');
+        if (atLastPost !== true) {
+          const response = await fetchRequest(`api/v1/entries?id=${id}`);
+          if (response.message) {
+            atLastPost = true;
+            const message = createNode('p', 'diary-message', response.message);
+            storyWrapper.appendChild(message);
+            return;
+          }
+          response.forEach(diary => {
+            createCards(diary);
+          });
+          addCardListenter();
+        }
       }
-    }
-  });
+    });
+  }
 };
 
 // View Strory
