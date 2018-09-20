@@ -44,8 +44,7 @@ class User {
    */
   static async logIn(req, res, next) {
     try {
-      const email = req.body.email.toLowerCase();
-      const { password } = req.body;
+      const { email, password } = req.body;
       const usersFound = await pool.query(query.find, [email]);
       if (usersFound.rows.length < 1) {
         res.status(404).send({ message: 'No associated account with that email. 😩' });

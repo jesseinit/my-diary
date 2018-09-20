@@ -87,11 +87,6 @@ html {
   display: table;
 }
 
-html,
-body {
-  height: 100%;
-}
-
 .container {
   width: 95%;
   margin: 0 auto;
@@ -104,7 +99,6 @@ a {
 
 body {
   font-size: 100%;
-  min-height: 100%;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -116,13 +110,6 @@ ul {
 img {
   max-width: 100%;
   height: auto;
-}
-
-.main {
-  /* flex: 1 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center; */
 }
 
 /* END OF BASE */
@@ -634,7 +621,7 @@ img {
   animation-duration: 0.5s;
   animation-timing-function: linear;
   top: 7px;
-  color: #eee;
+  color: #000;
 }
 .toast--success {
   background: #1aff1a;

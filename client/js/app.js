@@ -2,26 +2,29 @@ const signUpForm = document.querySelector('#signup-form');
 const loginForm = document.querySelector('#login-form');
 const storyWrapper = document.querySelector('.diary__cards');
 const newStoryForm = document.querySelector('#newstory-form');
-const errContainer = document.querySelector('.error-container');
 const logoutBtn = document.querySelector('#logout');
 const deleteStoryBtn = document.querySelector('.delete-confirm');
 const notification = document.querySelector('.profile__setting input');
+const toastErr = 'toast--error';
+const toastSuccess = 'toast--success';
 const publicVapid =
   'BM045LgB8vOm-HPga83qiFrUuCFaILe8ymx25HeBbyPB9eGiMnx7ljH6GJ5JVsyEXiBLq5j4OdoGClE-4ZhUW_M';
 
 /* UTILITY FUNCTIONS */
-// Success Toast
-const toastErr = 'toast--error';
-const toastSuccess = 'toast--success';
+const createNode = (element = HTMLElement, className, content) => {
+  const el = document.createElement(element);
+  el.className = className;
+  el.textContent = content;
+  return el;
+};
+
+const append = (parent, el) => parent.appendChild(el);
+
 const toast = (msg, className, delay = 5000) => {
-  const errorParagraph = document.createElement('p');
-  errorParagraph.textContent = msg;
-  const closeBtn = document.createElement('span');
-  closeBtn.innerHTML = '&times;';
-  const toastParent = document.createElement('div');
-  toastParent.className = 'toast';
-  toastParent.classList.add(className);
+  const errorParagraph = createNode('p', '', msg);
+  const toastParent = createNode('div', 'toast');
   toastParent.appendChild(errorParagraph);
+  toastParent.classList.add(className);
   const body = document.querySelector('body');
   body.insertBefore(toastParent, body.children[0]);
   setTimeout(() => {
@@ -29,16 +32,24 @@ const toast = (msg, className, delay = 5000) => {
   }, delay);
 };
 
-// Create the type of element you pass in the parameters
-const createNode = (element, className, content) => {
-  const el = document.createElement(element);
-  el.className = className;
-  el.textContent = content;
-  return el;
+const createCards = diary => {
+  const card = createNode('div', 'diary-card');
+  card.setAttribute('data-id', diary.id);
+  const cardTitle = createNode('p', 'diary-card-title', diary.title);
+  const cardBody = createNode('p', 'diary-card-body', diary.content);
+  const cardInfo = createNode('div', 'diary-card-info');
+  const cardDate = createNode('span', 'diary-card-date', new Date(diary.created_on).toDateString());
+  const cardView = createNode('span', 'diary-card-view');
+  const cardLink = createNode('a', '', 'Read Story');
+  cardLink.setAttribute('href', `./view-story.html?id=${diary.id}`);
+  append(card, cardTitle);
+  append(card, cardBody);
+  append(card, cardInfo);
+  append(cardInfo, cardDate);
+  append(cardInfo, cardView);
+  append(cardView, cardLink);
+  append(storyWrapper, card);
 };
-
-// Append the second parameter(element) to the first one
-const append = (parent, el) => parent.appendChild(el);
 
 // Fetch Helper Function
 const fetchRequest = async (url = '', method = 'GET', body = null) => {
@@ -49,12 +60,7 @@ const fetchRequest = async (url = '', method = 'GET', body = null) => {
     body,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
   })
-    .then(
-      res =>
-        res.ok
-          ? res.json()
-          : Promise.reject({ status: res.status, statusText: res.statusText }) /*  */
-    )
+    .then(res => (res.ok ? res.json() : Promise.reject(res.json())))
     .then(response => response)
     .catch(
       error => error /* Perform a Switch with error.status, there throw the respective toast */
@@ -136,27 +142,7 @@ const deleteStory = async e => {
   }
 };
 
-const createCards = diary => {
-  const card = createNode('div', 'diary-card');
-  card.setAttribute('data-id', diary.id);
-  const cardTitle = createNode('p', 'diary-card-title', diary.title);
-  const cardBody = createNode('p', 'diary-card-body', diary.content);
-  const cardInfo = createNode('div', 'diary-card-info');
-  const cardDate = createNode('span', 'diary-card-date', new Date(diary.created_on).toDateString());
-  const cardView = createNode('span', 'diary-card-view');
-  const cardLink = createNode('a', '', 'Read Story');
-  cardLink.setAttribute('href', `./view-story.html?id=${diary.id}`);
-  append(card, cardTitle);
-  append(card, cardBody);
-  append(card, cardInfo);
-  append(cardInfo, cardDate);
-  append(cardInfo, cardView);
-  append(cardView, cardLink);
-  append(storyWrapper, card);
-};
-
 const addCardListenter = () => {
-  // Make cards clickable and redirect to story on click
   Array.from(storyWrapper.children).forEach(child => {
     child.addEventListener('click', () => {
       const storyID = child.getAttribute('data-id');
@@ -207,17 +193,13 @@ const inifiteScroll = () => {
 const viewStory = async () => {
   const viewWrapper = document.querySelector('.view-card');
   try {
-    isLoggedIn();
-    // Get story id from the URL
     const diaryID = new URLSearchParams(window.location.search).get('id');
     const response = await fetchRequest(`/api/v1/entries/${diaryID}`);
     if (response.status) {
-      throw new Error();
+      throw new Error(response.statusText);
     }
-
     const dateCreated = new Date(response.created_on).getTime();
     const difference = (new Date().getTime() - dateCreated) / (1000 * 60 * 60);
-
     const cardTitle = createNode('p', 'view-card-title', response.title);
     const cardDate = createNode(
       'span',
@@ -249,7 +231,7 @@ const viewStory = async () => {
   } catch (error) {
     const cardBody = createNode('p');
     cardBody.className = 'view-card-body';
-    cardBody.textContent = 'Ooops - Dairy must have been deleted or doesnt exist';
+    cardBody.textContent = `Ooops - Dairy ${error}`;
     append(viewWrapper, cardBody);
   }
 };
@@ -319,123 +301,41 @@ const setUpNotification = async e => {
 // Register User
 const registerUser = async e => {
   try {
-    // Prevent form from performing it default action
     e.preventDefault();
-
     const email = document.querySelector('#reg-email').value;
     const fullname = document.querySelector('#reg-fullname').value;
     const password = document.querySelector('#reg-password').value;
-    const confirmPassword = document.querySelector('#reg-confirm-password').value;
-    let errors = [];
-    let errorStatus = false;
-    let errorOutput = '';
-
     // Fetch URL
-    const signUpUrl = '/api/v1/auth/signup';
-
-    // Check for password matching
-    if (password !== confirmPassword || confirmPassword.length < 6) {
-      errors.push('Password mismatch or Password too short');
-      errorStatus = true;
+    const signUpURI = '/api/v1/auth/signup';
+    const signUpInfo = JSON.stringify({ email, fullname, password });
+    const response = await fetchRequest(signUpURI, 'POST', signUpInfo);
+    if (response.message) {
+      throw new Error(response.message);
     }
-
-    // Check for name length
-    if (fullname.length < 2) {
-      errors.push('Fullname requires at least 2 characters');
-      errorStatus = true;
-    }
-
-    // Validate email input
-    const emailRegEx = /^([A-Za-z0-9_\-.+])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,})$/;
-    if (!emailRegEx.test(email)) {
-      errors.push('Invalid Email');
-      errorStatus = true;
-    }
-
-    // Error handler
-    if (errorStatus) {
-      errors.forEach(err => {
-        errorOutput += `<li>${err}</li>`;
-        errContainer.innerHTML = errorOutput;
-      });
-      errContainer.style.display = 'block';
-      errors = [];
-      return;
-    }
-
-    // Grab our form input values
-    const signUpInfo = JSON.stringify({ email, fullname, password: confirmPassword });
-
-    const response = await fetchRequest(signUpUrl, 'POST', signUpInfo);
-    console.log(response);
-
     localStorage.setItem('token', response.token);
-
     window.location.replace('./dashboard.html');
   } catch (error) {
-    errContainer.style.display = 'block';
-    errContainer.innerHTML = `<li>${error.message}</li>`;
+    toast(error, toastErr);
   }
 };
 
 // Login User
-const loginUser = e => {
-  e.preventDefault();
-  const logInUrl = '/api/v1/auth/login';
-  // Grab fields from the DOM
-  const email = document.querySelector('#login-email').value;
-  const password = document.querySelector('#login-password').value;
-  let errors = [];
-  let errorStatus = false;
-  let errorOutput = '';
-
-  // Validate Email
-  const emailRegEx = /^([A-Za-z0-9_\-.+])+@([A-Za-z0-9_\-.])+\.([A-Za-z]{2,})$/;
-  if (!emailRegEx.test(email)) {
-    errors.push('Invalid Email');
-    errorStatus = true;
+const loginUser = async e => {
+  try {
+    e.preventDefault();
+    const email = document.querySelector('#login-email').value;
+    const password = document.querySelector('#login-password').value;
+    const loginInfo = JSON.stringify({ email, password });
+    const loginURI = '/api/v1/auth/login';
+    const response = await fetchRequest(loginURI, 'POST', loginInfo);
+    if (response.message) {
+      throw new Error(response.message);
+    }
+    localStorage.setItem('token', response.token);
+    window.location.replace('./dashboard.html');
+  } catch (error) {
+    toast(error, toastErr);
   }
-  // Validate password
-  if (!password || password.length < 6) {
-    errors.push('Password is required to have six characters');
-    errorStatus = true;
-  }
-  // Handle Errors
-  if (errorStatus) {
-    errors.forEach(err => {
-      errorOutput += `<li>${err}</li>`;
-      errContainer.style.display = 'block';
-      errContainer.innerHTML = errorOutput;
-    });
-    errors = [];
-    return;
-  }
-
-  // Login Details
-  const loginInfo = JSON.stringify({ email, password });
-
-  // Fetch Options
-  const options = {
-    method: 'POST',
-    mode: 'cors',
-    body: loginInfo,
-    headers: { 'Content-Type': 'application/json' }
-  };
-
-  // Perform Fetch
-  fetch(logInUrl, options)
-    .then(res => res.json())
-    .then(res => {
-      if (res.token) {
-        localStorage.setItem('token', res.token);
-        // window.location.href = './dashboard.html';
-        window.location.replace('dashboard.html');
-      } else {
-        errContainer.style.display = 'block';
-        errContainer.innerHTML = `<li>${res.message}</li>`;
-      }
-    })
-    .catch(loginErr => console.log(loginErr));
 };
 
 // Logout User
@@ -528,6 +428,7 @@ switch (currentPage) {
     isLoggedIn();
     break;
   case '/view-story.html':
+    isLoggedIn();
     viewStory();
     break;
   case '/settings.html':
