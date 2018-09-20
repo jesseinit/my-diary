@@ -18,9 +18,9 @@ class Diary {
         const moreDiaries = await pool.query(query.getMore, [email, req.query.id]);
         if (moreDiaries.rowCount > 0) {
           res.status(200).json(moreDiaries.rows);
-        } else {
-          res.status(200).json({ message: 'You have reached the end' });
+          return;
         }
+        res.status(200).json({ message: 'You have reached the end' });
       }
       const diaries = await pool.query(query.getAll, [email]);
       if (diaries.rowCount > 0) {
