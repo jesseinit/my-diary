@@ -3,7 +3,11 @@ self.addEventListener('push', e => {
   const data = e.data.json();
   console.log('Push Received');
 
-  e.waitUntil(self.registration.showNotification(data.title, { body: 'Notified Blah Blah' }));
+  e.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: 'Let every moment count. Write a diary today in History'
+    })
+  );
 });
 
 self.addEventListener('notificationclick', e => {

@@ -16,7 +16,7 @@ const sendNotification = async () => {
     if (users.rowCount > 0)
       users.rows.forEach(async user => {
         const subscription = user.push_sub;
-        const payload = JSON.stringify({ title: 'Push Test' });
+        const payload = JSON.stringify({ title: `Hi ${user.fullname}` });
         await webpush.sendNotification(subscription, payload);
       });
     else {
