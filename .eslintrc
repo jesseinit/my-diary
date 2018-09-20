@@ -17,6 +17,7 @@
     "linebreak-style": 0,
     "comma-dangle": 0,
     "no-console": 0,
+    "prefer-promise-reject-errors":"off",
     "radix": 0
   }
 }

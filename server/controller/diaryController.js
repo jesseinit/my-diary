@@ -18,17 +18,16 @@ class Diary {
         const moreDiaries = await pool.query(query.getMore, [email, req.query.id]);
         if (moreDiaries.rowCount > 0) {
           res.status(200).json(moreDiaries.rows);
-          return;
+        } else {
+          res.status(200).json({ message: 'You have reached the end' });
         }
-        res.status(200).json({ message: 'You have reached the end' });
-      } else {
-        const diaries = await pool.query(query.getAll, [email]);
-        if (diaries.rowCount > 0) {
-          res.status(200).json(diaries.rows);
-          return;
-        }
-        res.status(200).json({ message: 'No diary to display' });
       }
+      const diaries = await pool.query(query.getAll, [email]);
+      if (diaries.rowCount > 0) {
+        res.status(200).json(diaries.rows);
+        return;
+      }
+      res.status(200).json({ message: 'No diary to display' });
     } catch (error) {
       res.status(500).json({ message: error });
       next(error);

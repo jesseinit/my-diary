@@ -149,9 +149,7 @@ const deleteStory = async e => {
 const loadStories = async () => {
   const response = await fetchRequest('/api/v1/entries/');
   if (response.message) {
-    const message = createNode('p');
-    message.className = 'diary-message';
-    message.textContent = response.message;
+    const message = createNode('p', 'diary-message', response.message);
     storyWrapper.parentNode.insertBefore(message, storyWrapper);
   } else {
     response.forEach(diary => {
@@ -542,9 +540,7 @@ window.addEventListener('scroll', async () => {
     const url = `api/v1/entries?id=${id}`;
     const response = await fetchRequest(url);
     if (response.message) {
-      const message = createNode('p');
-      message.className = 'diary-message';
-      message.textContent = response.message;
+      const message = createNode('p', 'diary-message', response.message);
       storyWrapper.appendChild(message);
     } else {
       response.forEach(diary => {
