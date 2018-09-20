@@ -21,6 +21,7 @@ class Diary {
           return;
         }
         res.status(200).json({ message: 'You have reached the end' });
+        return;
       }
       const diaries = await pool.query(query.getAll, [email]);
       if (diaries.rowCount > 0) {
@@ -28,6 +29,7 @@ class Diary {
         return;
       }
       res.status(200).json({ message: 'No diary to display' });
+      return;
     } catch (error) {
       res.status(500).json({ message: error });
       next(error);
