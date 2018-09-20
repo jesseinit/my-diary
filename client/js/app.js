@@ -176,7 +176,7 @@ const inifiteScroll = () => {
           if (response.message) {
             atLastPost = true;
             const message = createNode('p', 'diary-message', response.message);
-            storyWrapper.appendChild(message);
+            document.querySelector('.diary').appendChild(message);
             return;
           }
           response.forEach(diary => {
@@ -235,7 +235,7 @@ const viewStory = async () => {
     append(viewWrapper, cardBody);
   }
 };
-
+/* Notification Functionality */
 const checkSwSupport = e => {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     toast('Service Worker not Supported in your Browser', toastErr);
@@ -309,7 +309,7 @@ const registerUser = async e => {
     const signUpURI = '/api/v1/auth/signup';
     const signUpInfo = JSON.stringify({ email, fullname, password });
     const response = await fetchRequest(signUpURI, 'POST', signUpInfo);
-    if (response.message) {
+    if (!response.token) {
       throw new Error(response.message);
     }
     localStorage.setItem('token', response.token);
@@ -328,7 +328,7 @@ const loginUser = async e => {
     const loginInfo = JSON.stringify({ email, password });
     const loginURI = '/api/v1/auth/login';
     const response = await fetchRequest(loginURI, 'POST', loginInfo);
-    if (response.message) {
+    if (!response.token) {
       throw new Error(response.message);
     }
     localStorage.setItem('token', response.token);
@@ -349,30 +349,23 @@ const logoutUser = e => {
 
 // Create Story
 const createStory = async e => {
-  e.preventDefault();
-  isLoggedIn();
-
-  // Create Endpoint URL
-  const newStoryEndpoint = '/api/v1/entries';
-
-  // Grab DOM Element
-  const title = document.querySelector('.diary-title').value;
-  const content = document.querySelector('.diary-content').value;
-
-  if (title.length > 100) {
-    // ToastFailure ('Title should not exceed 100 Characters')
-    console.log('Title Should not be more than 100 Chars Long');
-    return;
-  }
-
-  // Grab our form input values
-  const newStoryData = JSON.stringify({ title, content });
-
-  const response = await fetchRequest(newStoryEndpoint, 'POST', newStoryData);
-
-  if (response.result) {
-    // ToastSuccess(response.message)
+  try {
+    e.preventDefault();
+    isLoggedIn();
+    const title = document.querySelector('.diary-title').value;
+    const content = document.querySelector('.diary-content').value;
+    const newStoryInput = JSON.stringify({ title, content });
+    const newStoryURI = '/api/v1/entries';
+    toast('Creating Your Story...', toastErr);
+    const response = await fetchRequest(newStoryURI, 'POST', newStoryInput);
+    if (!response.result) {
+      // Gets this from the validateInput.js Middleware
+      throw new Error(response.message[0]);
+    }
+    toast(response.message, toastSuccess);
     window.location.replace(`./view-story.html?id=${response.result.id}`);
+  } catch (error) {
+    toast(error, toastErr);
   }
 };
 

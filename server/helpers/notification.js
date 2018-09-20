@@ -18,7 +18,7 @@ const sendNotification = async () => {
         const subscription = user.push_sub;
         const payload = JSON.stringify({
           title: `Hi ${user.fullname}`,
-          body: 'Let every moment count. Write a diary today in History'
+          body: 'Let every moment count. Write a diary of today in History'
         });
         await webpush.sendNotification(subscription, payload);
       });

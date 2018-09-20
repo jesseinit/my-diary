@@ -207,10 +207,12 @@ img {
 /* FORM STYLES */
 .form {
   margin-top: 70px;
+  margin-left: auto;
+  margin-right: auto;
   width: 100%;
   background: #fff;
   box-shadow: 0 5px 20px -5px rgba(0, 0, 0, 0.5);
-  transition: box-shadow 1s ease;
+  transition: width 1s ease;
 }
 .form__header {
   margin-bottom: 15px;
@@ -672,40 +674,35 @@ img {
     grid-template-columns: repeat(1, 1fr);
   }
 } */
-/* @media screen and (min-width: 480px) {
-  .nav-logo {
-    font-size: 1.5em;
-  }
-  .nav-menu-item a {
-    font-size: 14px;
-  }
-
-  .hero-caption {
-    font-size: 1.8em;
+@media screen and (min-width: 480px) {
+  .form {
+    width: 80%;
   }
 }
-
 @media screen and (min-width: 600px) {
-  .diary-card {
-    width: 49%;
-  }
-  .form_wrapper {
-    width: 70vw;
+  .form {
+    width: 60%;
   }
 }
-
-@media screen and (min-width: 960px) {
-  .diary-card {
-    width: 33%;
+@media screen and (min-width: 800px) {
+  .form {
+    width: 50%;
   }
 
-  .hero-caption {
-    font-size: 2em;
+  .diary__cards {
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 7px;
+  }
+}
+@media screen and (min-width: 1024px) {
+  .form {
+    width: 40%;
   }
 
-  .form_wrapper {
-    width: 33vw;
+  .diary__cards {
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 10px;
   }
-} */
+}
 
 /*# sourceMappingURL=styles.css.map */
