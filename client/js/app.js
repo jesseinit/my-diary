@@ -14,26 +14,19 @@ const publicVapid =
 const toastErr = 'toast--error';
 const toastSuccess = 'toast--success';
 const toast = (msg, className, delay = 5000) => {
-  // Create Children
   const errorParagraph = document.createElement('p');
   errorParagraph.textContent = msg;
   const closeBtn = document.createElement('span');
   closeBtn.innerHTML = '&times;';
-  // Create Parent Element
   const toastParent = document.createElement('div');
   toastParent.className = 'toast';
   toastParent.classList.add(className);
   toastParent.appendChild(errorParagraph);
-  // toastParent.appendChild(closeBtn);
   const body = document.querySelector('body');
-  // Append child to body
   body.insertBefore(toastParent, body.children[0]);
   setTimeout(() => {
     body.removeChild(toastParent);
   }, delay);
-  /* closeBtn.addEventListener('click', e => {
-    e.target.parentElement.remove();
-  }); */
 };
 
 // Create the type of element you pass in the parameters
@@ -61,7 +54,7 @@ const fetchRequest = async (url = '', method = 'GET', body = null) => {
         res.ok
           ? res.json()
           : Promise.reject({ status: res.status, statusText: res.statusText }) /*  */
-    ) // "prefer-promise-reject-errors":"off",
+    )
     .then(response => response)
     .catch(
       error => error /* Perform a Switch with error.status, there throw the respective toast */
@@ -137,12 +130,39 @@ const deleteStory = async e => {
     const requestURL = `/api/v1/entries/${storyID}`;
     await fetchRequest(requestURL, 'DELETE');
     toast('Message Deleted', toastSuccess);
-    setTimeout(() => {
-      window.location.replace('./dashboard.html');
-    }, 1000);
+    window.location.replace('./dashboard.html');
   } catch (error) {
     window.location.replace(`./view-story.html?id=${storyID}`);
   }
+};
+
+const createCards = diary => {
+  const card = createNode('div', 'diary-card');
+  card.setAttribute('data-id', diary.id);
+  const cardTitle = createNode('p', 'diary-card-title', diary.title);
+  const cardBody = createNode('p', 'diary-card-body', diary.content);
+  const cardInfo = createNode('div', 'diary-card-info');
+  const cardDate = createNode('span', 'diary-card-date', new Date(diary.created_on).toDateString());
+  const cardView = createNode('span', 'diary-card-view');
+  const cardLink = createNode('a', '', 'Read Story');
+  cardLink.setAttribute('href', `./view-story.html?id=${diary.id}`);
+  append(card, cardTitle);
+  append(card, cardBody);
+  append(card, cardInfo);
+  append(cardInfo, cardDate);
+  append(cardInfo, cardView);
+  append(cardView, cardLink);
+  append(storyWrapper, card);
+};
+
+const addCardListenter = () => {
+  // Make cards clickable and redirect to story on click
+  Array.from(storyWrapper.children).forEach(child => {
+    child.addEventListener('click', () => {
+      const storyID = child.getAttribute('data-id');
+      window.location.href = `./view-story.html?id=${storyID}`;
+    });
+  });
 };
 
 // Load Stories
@@ -153,35 +173,29 @@ const loadStories = async () => {
     storyWrapper.parentNode.insertBefore(message, storyWrapper);
   } else {
     response.forEach(diary => {
-      const card = createNode('div', 'diary-card');
-      card.setAttribute('data-id', diary.id);
-      const cardTitle = createNode('p', 'diary-card-title', diary.title);
-      const cardBody = createNode('p', 'diary-card-body', diary.content);
-      const cardInfo = createNode('div', 'diary-card-info');
-      const cardDate = createNode(
-        'span',
-        'diary-card-date',
-        new Date(diary.created_on).toDateString()
-      );
-      const cardView = createNode('span', 'diary-card-view');
-      const cardLink = createNode('a', '', 'Read Story');
-      cardLink.setAttribute('href', `./view-story.html?id=${diary.id}`);
-      append(card, cardTitle);
-      append(card, cardBody);
-      append(card, cardInfo);
-      append(cardInfo, cardDate);
-      append(cardInfo, cardView);
-      append(cardView, cardLink);
-      append(storyWrapper, card);
+      createCards(diary);
     });
-    // Make cards clickable and redirect to story on click
-    Array.from(storyWrapper.children).forEach(child => {
-      child.addEventListener('click', () => {
-        const storyID = child.getAttribute('data-id');
-        window.location.href = `./view-story.html?id=${storyID}`;
-      });
-    });
+    addCardListenter();
   }
+};
+
+const inifiteScroll = () => {
+  window.addEventListener('scroll', async () => {
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight) {
+      const id = storyWrapper.lastChild.getAttribute('data-id');
+      const url = `api/v1/entries?id=${id}`;
+      const response = await fetchRequest(url);
+      if (response.message) {
+        const message = createNode('p', 'diary-message', response.message);
+        storyWrapper.appendChild(message);
+      } else {
+        response.forEach(diary => {
+          createCards(diary);
+        });
+        addCardListenter();
+      }
+    }
+  });
 };
 
 // View Strory
@@ -255,7 +269,9 @@ const askPermission = async e => {
 
 const subscribeUser = async () => {
   const swRegistration = await navigator.serviceWorker.register('./sw.js', { scope: '/' });
-  const subscription = await swRegistration.pushManager.subscribe({
+  let subscription = await swRegistration.pushManager.getSubscription();
+  subscription.unsubscribe();
+  subscription = await swRegistration.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(publicVapid)
   });
@@ -501,6 +517,7 @@ switch (currentPage) {
   case '/dashboard.html':
     isLoggedIn();
     loadStories();
+    inifiteScroll();
     break;
   case '/new-story.html':
     isLoggedIn();
@@ -514,44 +531,3 @@ switch (currentPage) {
   default:
     break;
 }
-
-window.addEventListener('scroll', async () => {
-  if (window.innerHeight + window.scrollY >= document.body.scrollHeight) {
-    const id = storyWrapper.lastChild.getAttribute('data-id');
-    const url = `api/v1/entries?id=${id}`;
-    const response = await fetchRequest(url);
-    if (response.message) {
-      const message = createNode('p', 'diary-message', response.message);
-      storyWrapper.appendChild(message);
-    } else {
-      response.forEach(diary => {
-        const card = createNode('div', 'diary-card');
-        card.setAttribute('data-id', diary.id);
-        const cardTitle = createNode('p', 'diary-card-title', diary.title);
-        const cardBody = createNode('p', 'diary-card-body', diary.content);
-        const cardInfo = createNode('div', 'diary-card-info');
-        const cardDate = createNode(
-          'span',
-          'diary-card-date',
-          new Date(diary.created_on).toDateString()
-        );
-        const cardView = createNode('span', 'diary-card-view');
-        const cardLink = createNode('a', '', 'Read Story');
-        cardLink.setAttribute('href', `./view-story.html?id=${diary.id}`);
-        append(card, cardTitle);
-        append(card, cardBody);
-        append(card, cardInfo);
-        append(cardInfo, cardDate);
-        append(cardInfo, cardView);
-        append(cardView, cardLink);
-        append(storyWrapper, card);
-      });
-      Array.from(storyWrapper.children).forEach(child => {
-        child.addEventListener('click', () => {
-          const storyID = child.getAttribute('data-id');
-          window.location.href = `./view-story.html?id=${storyID}`;
-        });
-      });
-    }
-  }
-});
