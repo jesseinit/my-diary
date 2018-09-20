@@ -13,7 +13,8 @@
     "build": "babel -d ./build ./server",
     "test": "nyc --reporter=text-summary --reporter=html mocha --exit --require babel-register",
     "start": "npm run build && node ./build/app",
-    "dev": "nodemon --exec babel-node  -- ./server/app.js --env",
+    "sendNotification":"babel-node ./server/helpers/notification.js --env",
+    "dev": "nodemon --exec babel-node ./server/app.js --env",
     "coveralls": "nyc --reporter=text npm test"
   },
   "dependencies": {

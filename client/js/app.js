@@ -235,76 +235,62 @@ const viewStory = async () => {
   }
 };
 
+const checkSwSupport = e => {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    toast('Service Worker not Supported in your Browser', toastErr);
+    e.target.checked = false;
+    return false;
+  }
+  return true;
+};
+
+const askPermission = async e => {
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') {
+    e.target.checked = false;
+    return false;
+  }
+  return true;
+};
+
+const subscribeUser = async () => {
+  const swRegistration = await navigator.serviceWorker.register('./sw.js', { scope: '/' });
+  const subscription = await swRegistration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(publicVapid)
+  });
+  return subscription;
+};
+
 // Notification Settings
 const setUpNotification = async e => {
   if (e.target.checked === true) {
     try {
-      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-        console.log('Service Worker not Supported in your Browser');
-        toast('Service Worker not Supported in your Browser', toastErr);
-        e.target.checked = false;
+      const swSupported = checkSwSupport(e);
+      const permissionStatus = await askPermission(e);
+      if (!swSupported || !permissionStatus) {
+        toast('Service Worker Not Supported or Notification Not Granted', toastErr);
         return;
       }
-      console.log('Service Worker Supported in your Browser');
-      console.log('Installing Service Worker');
-      console.log('Registering Service Worker');
-      const swRegistration = await navigator.serviceWorker.register('./sw.js', { scope: '/' });
-      console.log('Registered and Installed Service Worker');
-      console.log('Requesting Push Notification Permission');
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        console.log('Notification Blocked - Kindly Enable Notifications');
-        // toastFailure('Notification Blocked - Kindly Enable Notifications')
-        toast('Notification Blocked - Kindly Enable Notifications', toastErr);
-        e.target.checked = false;
-        return;
-      }
-      console.log('Push Notification Permission Granted');
-      console.log('Checking For Existing Subscription');
-      const subscriptionStatus = await swRegistration.pushManager.getSubscription();
-      if (subscriptionStatus) {
-        console.log('Subscription Found...Unsubscribing');
-        subscriptionStatus.unsubscribe();
-      }
-      console.log('Subscribing User');
-      const subscription = await swRegistration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(publicVapid)
-      });
-      const url = '/api/v1/profile/';
-      const reminder = true;
-      const pushSubscription = subscription;
-      const data = JSON.stringify({ reminder, pushSubscription });
-      const response = await fetchRequest(url, 'PUT', data);
+      const subscription = await subscribeUser();
+      const data = JSON.stringify({ reminder: true, pushSubscription: subscription });
+      await fetchRequest('/api/v1/profile/', 'PUT', data);
       toast('You have subscribed to Push Notification', toastSuccess);
-      console.log(response);
-      console.log('User Subscribed');
     } catch (error) {
       e.target.checked = false;
       toast(error, toastErr);
-      console.log(error);
     }
   } else {
     try {
-      console.log('Registering Service Worker');
-      const swRegistration = await navigator.serviceWorker.register('./sw.js', { scope: '/' });
-      console.log('Checking For Existing Subscription');
-      const subscription = await swRegistration.pushManager.getSubscription();
-      console.log('Subscription Found...Unsubscribing');
+      const subscription = await subscribeUser();
       subscription.unsubscribe();
-      const url = '/api/v1/profile/';
-      const reminder = false;
-      const pushSubscription = null;
-      const data = JSON.stringify({ reminder, pushSubscription });
-      await fetchRequest(url, 'PUT', data);
+      const data = JSON.stringify({ reminder: false, pushSubscription: null });
+      await fetchRequest('/api/v1/profile/', 'PUT', data);
       e.target.checked = false;
-      console.log('You have Unsubscribed to Push Notification');
       toast('You have Unsubscribed to Push Notification', toastSuccess);
     } catch (error) {
-      console.log('Could not Unsubscribed to Push');
       e.target.checked = true;
       toast(error, toastErr);
-      console.log(error);
     }
   }
 };
@@ -374,9 +360,7 @@ const registerUser = async e => {
 // Login User
 const loginUser = e => {
   e.preventDefault();
-
   const logInUrl = '/api/v1/auth/login';
-
   // Grab fields from the DOM
   const email = document.querySelector('#login-email').value;
   const password = document.querySelector('#login-password').value;
@@ -407,16 +391,13 @@ const loginUser = e => {
   }
 
   // Login Details
-  const loginInfo = {
-    email,
-    password
-  };
+  const loginInfo = JSON.stringify({ email, password });
 
   // Fetch Options
   const options = {
     method: 'POST',
     mode: 'cors',
-    body: JSON.stringify(loginInfo),
+    body: loginInfo,
     headers: { 'Content-Type': 'application/json' }
   };
 
@@ -565,7 +546,6 @@ window.addEventListener('scroll', async () => {
         append(cardView, cardLink);
         append(storyWrapper, card);
       });
-      // Make cards clickable and redirect to story on click
       Array.from(storyWrapper.children).forEach(child => {
         child.addEventListener('click', () => {
           const storyID = child.getAttribute('data-id');
