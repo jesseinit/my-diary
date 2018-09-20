@@ -388,36 +388,22 @@ const loadProfile = async () => {
   notification.checked = response.reminder;
 };
 
-if (signUpForm) {
-  signUpForm.addEventListener('submit', registerUser);
-}
+if (signUpForm) signUpForm.addEventListener('submit', registerUser);
 
-if (loginForm) {
-  loginForm.addEventListener('submit', loginUser);
-}
+if (loginForm) loginForm.addEventListener('submit', loginUser);
 
-if (logoutBtn) {
-  logoutBtn.addEventListener('click', logoutUser);
-}
+if (logoutBtn) logoutBtn.addEventListener('click', logoutUser);
 
-if (newStoryForm) {
-  newStoryForm.addEventListener('submit', createStory);
-}
+if (newStoryForm) newStoryForm.addEventListener('submit', createStory);
 
-if (deleteStoryBtn) {
-  deleteStoryBtn.addEventListener('click', deleteStory);
-}
+if (deleteStoryBtn) deleteStoryBtn.addEventListener('click', deleteStory);
 
-if (notification) {
-  notification.addEventListener('change', setUpNotification);
-}
+if (notification) notification.addEventListener('change', setUpNotification);
 
 const currentPage = window.location.pathname;
 switch (currentPage) {
   case '/index.html':
-    if (localStorage.getItem('token')) {
-      window.location.replace('./dashboard.html');
-    }
+    if (localStorage.getItem('token')) window.location.replace('./dashboard.html');
     break;
   case '/dashboard.html':
     isLoggedIn();
