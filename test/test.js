@@ -554,7 +554,7 @@ describe('My Diary Application', () => {
           done();
         });
     });
-    it('It should return internal server error when user tries to fetch profile due to DB connection error', done => {
+    it('It should return internal server error when user tries to update profile due to DB connection error', done => {
       const stub = sinon.stub(pool, 'query').callsFake(() => Promise.reject());
       chai
         .request(app)
@@ -596,7 +596,7 @@ describe('My Diary Application', () => {
     });
 
     it('It should NOT send notification when there is no user with subscription', async () => {
-      pool.query('UPDATE users SET reminder = $1, push_sub = $2 RETURNING reminder', [false, null]);
+      pool.query('Truncate table users');
       const spy = sinon.spy(webpush, 'sendNotification');
       await sendNotification();
       expect(spy.called).to.be.eql(false);

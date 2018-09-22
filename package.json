@@ -14,7 +14,7 @@
     "test": "nyc --reporter=text-summary --reporter=html mocha --exit --require babel-register",
     "sass": "sass --watch --style expanded client/scss:client/css",
     "start": "npm run build && node ./build/app",
-    "sendNotification":"babel-node ./server/helpers/notification.js --env",
+    "sendNotification":"node ./build/helpers/notification",
     "dev": "nodemon --exec babel-node ./server/app.js --env",
     "coveralls": "nyc --reporter=text npm test"
   },
