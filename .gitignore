@@ -4,3 +4,5 @@ coverage
 .coveralls.yml
 .env
 build
+.sass-cache
+client/scss

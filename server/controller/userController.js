@@ -18,13 +18,13 @@ class User {
   static async signUp(req, res, next) {
     try {
       const { email, fullname, password } = req.body;
-      const usersFound = await pool.query(query.find, [email]);
+      const usersFound = await pool.query(query.findUser(email));
       if (usersFound.rowCount > 0) {
         res.status(409).json({ message: 'Email address already taken' });
         return;
       }
       const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = await pool.query(query.regUser, [email, fullname, hashedPassword]);
+      const newUser = await pool.query(query.regUser(email, fullname, hashedPassword));
       const token = jwt.sign({ email: newUser.rows[0].email }, SECRET_KEY, { expiresIn: '1h' });
       res.status(201).json({ message: 'Registration Successful', token });
     } catch (error) {
@@ -45,7 +45,7 @@ class User {
   static async logIn(req, res, next) {
     try {
       const { email, password } = req.body;
-      const usersFound = await pool.query(query.find, [email]);
+      const usersFound = await pool.query(query.findUser(email));
       if (usersFound.rows.length < 1) {
         res.status(404).send({ message: 'No associated account with that email. 😩' });
         return;
@@ -77,8 +77,8 @@ class User {
   static async getProfile(req, res, next) {
     try {
       const { email } = req.authUser;
-      const usersDetails = await pool.query(query.find, [email]);
-      const postCount = await pool.query(query.getPostCount, [email]);
+      const usersDetails = await pool.query(query.findUser(email));
+      const postCount = await pool.query(query.getPostCount(email));
       const { fullname, reminder } = usersDetails.rows[0];
       res.status(200).json({
         fullname,
@@ -105,7 +105,7 @@ class User {
     try {
       const { email } = req.authUser;
       const { reminder, pushSubscription } = req.body;
-      const user = await pool.query(query.updateUser, [reminder, pushSubscription, email]);
+      const user = await pool.query(query.updateUser(reminder, pushSubscription, email));
       res
         .status(200)
         .json({ reminder: user.rows[0].reminder, subscription: user.rows[0].push_sub });

@@ -6,7 +6,7 @@ dotenv.config();
 const verifyAuthToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (typeof authHeader === 'undefined') {
-    res.status(401).json({ error: 'Unauthorised - Header Not Set' });
+    res.status(401).json({ err: 'Unauthorised - Header Not Set' });
     return;
   }
   const token = authHeader.split(' ')[1];

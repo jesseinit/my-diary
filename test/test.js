@@ -223,7 +223,7 @@ describe('My Diary Application', () => {
         .set('Content-Type', 'application/json')
         .send(entry.validEntry)
         .end((err, res) => {
-          cachedEntry = res.body.result;
+          cachedEntry = res.body.data;
           expect(res.status).to.equal(201);
           done();
         });

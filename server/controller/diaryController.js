@@ -15,17 +15,17 @@ class Diary {
     try {
       const { email } = req.authUser;
       if (req.query.id) {
-        const moreDiaries = await pool.query(query.getMore, [email, req.query.id]);
+        const moreDiaries = await pool.query(query.getMore(email, req.query.id));
         if (moreDiaries.rowCount > 0) {
-          res.status(200).json(moreDiaries.rows);
+          res.status(200).json({ data: moreDiaries.rows });
           return;
         }
         res.status(200).json({ message: 'You have reached the end' });
         return;
       }
-      const diaries = await pool.query(query.getAll, [email]);
+      const diaries = await pool.query(query.getAll(email));
       if (diaries.rowCount > 0) {
-        res.status(200).json(diaries.rows);
+        res.status(200).json({ data: diaries.rows });
         return;
       }
       res.status(200).json({ message: 'No diary to display' });
@@ -49,8 +49,8 @@ class Diary {
       const { email } = req.authUser;
       const title = req.body.title || 'Untitled Diary';
       const content = req.body.content || 'Empty content';
-      const result = await pool.query(query.saveDiary, [email, title, content]);
-      res.status(201).json({ message: 'Story Created', result: result.rows[0] });
+      const result = await pool.query(query.saveDiary(email, title, content));
+      res.status(201).json({ message: 'Story Created', data: result.rows[0] });
     } catch (error) {
       res.status(500).json({ message: error });
       next(error);
@@ -69,9 +69,9 @@ class Diary {
     try {
       const { email } = req.authUser;
       const { id } = req.params;
-      const diary = await pool.query(query.getOne, [email, id]);
-      if (diary.rowCount) {
-        res.status(200).json(diary.rows[0]);
+      const diary = await pool.query(query.getOne(email, id));
+      if (diary.rowCount > 0) {
+        res.status(200).json({ data: diary.rows[0] });
       } else {
         res.status(404).json({ message: 'No diary to display' });
       }
@@ -95,7 +95,7 @@ class Diary {
       const { id } = req.params;
       const { title, content } = req.body;
       const updated = new Date();
-      const result = await pool.query(query.getOne, [email, id]);
+      const result = await pool.query(query.getOne(email, id));
       if (!result.rowCount) {
         res.status(404).json({ message: 'Story not found' });
         return;
@@ -106,7 +106,7 @@ class Diary {
         res.status(403).json({ message: 'Story is too old' });
         return;
       }
-      const updateData = await pool.query(query.updateOne, [title, content, updated, email, id]);
+      const updateData = await pool.query(query.updateDairy(title, content, updated, email, id));
       res.status(200).json({ message: 'Story has been updated', data: updateData.rows[0] });
     } catch (error) {
       res.status(500).json({ message: error });
@@ -126,7 +126,7 @@ class Diary {
     try {
       const { id } = req.params;
       const { email } = req.authUser;
-      const result = await pool.query(query.deleteOne, [email, id]);
+      const result = await pool.query(query.deleteDiary(email, id));
       if (result.rowCount) {
         res.status(200).json({ message: 'Story has been deleted' });
       } else {

@@ -62,17 +62,14 @@ const fetchRequest = async (url = '', method = 'GET', body = null) => {
   })
     .then(res => (res.ok ? res.json() : Promise.reject(res.json())))
     .then(response => response)
-    .catch(
-      error => error /* Perform a Switch with error.status, there throw the respective toast */
-    );
+    .catch(error => error);
 };
 
 // Check Token Validity
 const isLoggedIn = async () => {
   const response = await fetchRequest('/api/v1/entries/');
-  // Once response.status is set then the promise is rejecting which means an error => line 37
-  if (response.status) {
-    localStorage.removeItem('token');
+  if (response.err) {
+    localStorage.clear();
     window.location.replace('./login.html');
   }
 };
@@ -89,7 +86,160 @@ const urlBase64ToUint8Array = base64String => {
   return outputArray;
 };
 
+const addCardListenter = () => {
+  Array.from(storyWrapper.children).forEach(child => {
+    child.addEventListener('click', () => {
+      const storyID = child.getAttribute('data-id');
+      window.location.href = `./view-story.html?id=${storyID}`;
+    });
+  });
+};
+
+/* Notification Functionality */
+const checkSwSupport = e => {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    toast('Service Worker not Supported in your Browser', toastErr);
+    e.target.checked = false;
+    return false;
+  }
+  return true;
+};
+
+const askPermission = async e => {
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') {
+    e.target.checked = false;
+    return false;
+  }
+  return true;
+};
+
+const subscribeUser = async () => {
+  const swRegistration = await navigator.serviceWorker.register('./sw.js', { scope: '/' });
+  let subscription = await swRegistration.pushManager.getSubscription();
+  subscription.unsubscribe();
+  subscription = await swRegistration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(publicVapid)
+  });
+  return subscription;
+};
 /* END OF UTILITY FUNCTIONS */
+
+// Register User
+const registerUser = async e => {
+  try {
+    e.preventDefault();
+    const email = document.querySelector('#reg-email').value;
+    const fullname = document.querySelector('#reg-fullname').value;
+    const password = document.querySelector('#reg-password').value;
+    const confirmPassword = document.querySelector('#reg-confirm-password').value;
+    if (password !== confirmPassword) {
+      toast('Your password are not matching', toastErr);
+      return;
+    }
+    const signUpURI = '/api/v1/auth/signup';
+    const signUpInfo = JSON.stringify({ email, fullname, password });
+    const response = await fetchRequest(signUpURI, 'POST', signUpInfo);
+    if (!response.token) {
+      throw new Error(response.message);
+    }
+    localStorage.setItem('token', response.token);
+    window.location.replace('./dashboard.html');
+  } catch (error) {
+    toast('There has been an error from your input', toastErr);
+  }
+};
+
+// Login User
+const loginUser = async e => {
+  try {
+    e.preventDefault();
+    const email = document.querySelector('#login-email').value;
+    const password = document.querySelector('#login-password').value;
+    const loginInfo = JSON.stringify({ email, password });
+    const loginURI = '/api/v1/auth/login';
+    const response = await fetchRequest(loginURI, 'POST', loginInfo);
+    if (!response.token) {
+      throw new Error(response.message);
+    }
+    localStorage.setItem('token', response.token);
+    window.location.replace('./dashboard.html');
+  } catch (error) {
+    toast(error, toastErr);
+  }
+};
+
+// Logout User
+const logoutUser = e => {
+  e.preventDefault();
+  localStorage.clear();
+  window.location.replace('./login.html');
+};
+
+// Load Stories
+const loadStories = async () => {
+  isLoggedIn();
+  const response = await fetchRequest('/api/v1/entries/');
+  if (!response.data) {
+    const message = createNode('p', 'diary-message', 'You have not created any diaries yet');
+    storyWrapper.parentNode.insertBefore(message, storyWrapper);
+  } else {
+    response.data.forEach(diary => {
+      createCards(diary);
+    });
+    addCardListenter();
+  }
+};
+
+// Infinity Scroll
+const infiniteScroll = () => {
+  let atLastPost = false;
+  if (atLastPost === false) {
+    window.addEventListener('scroll', async () => {
+      isLoggedIn();
+      if (window.innerHeight + window.scrollY >= document.body.scrollHeight) {
+        const id = storyWrapper.lastChild.getAttribute('data-id');
+        if (atLastPost !== true) {
+          const response = await fetchRequest(`api/v1/entries?id=${id}`);
+          if (!response.data) {
+            atLastPost = true;
+            const message = createNode('p', 'diary-message', response.message);
+            document.querySelector('.diary').appendChild(message);
+            return;
+          }
+          response.data.forEach(diary => {
+            createCards(diary);
+          });
+          addCardListenter();
+        }
+      }
+    });
+  }
+};
+
+// Create Story
+const createStory = async e => {
+  try {
+    e.preventDefault();
+    isLoggedIn();
+    const title = document.querySelector('.diary-title').value;
+    const content = document.querySelector('.diary-content').value;
+    const newStoryInput = JSON.stringify({ title, content });
+    const newStoryURI = '/api/v1/entries';
+    toast('Creating Your Story...', toastErr);
+    const response = await fetchRequest(newStoryURI, 'POST', newStoryInput);
+    if (!response.data) {
+      // Gets this from the validateInput.js Middleware
+      toast(response.message[0], toastErr);
+      return;
+    }
+    toast(response.message, toastSuccess);
+    window.location.replace(`./view-story.html?id=${response.data.id}`);
+  } catch (error) {
+    toast(error, toastErr);
+  }
+};
 
 // Update Story
 const updateStory = async e => {
@@ -119,11 +269,57 @@ const updateStory = async e => {
         title: storyTitle.textContent,
         content: storyContent.textContent
       });
+      toast('Updating Story...', toastSuccess);
       await fetchRequest(updateEndpoint, 'PUT', updateData);
-      toast('Story Has Been Updated', toastSuccess, 3000);
+      toast('Story Has Been Updated', toastSuccess, 7000);
     }
   } catch (error) {
     toast('Error Updating Story', toastErr, 3000);
+  }
+};
+
+// View Strory
+const viewStory = async () => {
+  const viewWrapper = document.querySelector('.view-card');
+  try {
+    const diaryID = new URLSearchParams(window.location.search).get('id');
+    let response = await fetchRequest(`/api/v1/entries/${diaryID}`);
+    if (!response.data) {
+      throw new Error(response.message);
+    }
+    response = response.data;
+    const dateCreated = new Date(response.created_on).getTime();
+    const difference = (new Date().getTime() - dateCreated) / (1000 * 60 * 60);
+    const cardTitle = createNode('p', 'view-card-title', response.title);
+    const cardDate = createNode(
+      'span',
+      'view-card-date',
+      new Date(response.created_on).toDateString()
+    );
+    const cardBody = createNode('div', 'view-card-body', response.content);
+    const cardAction = createNode('span', 'view-card-actions');
+    const cardDelete = createNode('a', 'view-del-btn', 'Delete Story');
+    cardDelete.setAttribute('href', '#infopanel');
+    const cardEdit = createNode('button', 'view-edit-btn', 'Edit Story');
+    if (difference > 24) {
+      cardEdit.disabled = true;
+      cardEdit.textContent = 'Edit Disabled';
+      cardEdit.style.background = '#c5c5c5';
+      cardEdit.style.cursor = 'not-allowed';
+    }
+    append(cardAction, cardDelete);
+    append(cardAction, cardEdit);
+    append(viewWrapper, cardTitle);
+    append(viewWrapper, cardDate);
+    append(viewWrapper, cardBody);
+    append(viewWrapper, cardAction);
+    const editStoryBtn = document.querySelector('.view-edit-btn');
+    editStoryBtn.addEventListener('click', updateStory);
+  } catch (error) {
+    const cardBody = createNode('p');
+    cardBody.className = 'view-card-body';
+    cardBody.textContent = `Ooops - Dairy was not found`;
+    append(viewWrapper, cardBody);
   }
 };
 
@@ -133,136 +329,14 @@ const deleteStory = async e => {
   try {
     e.preventDefault();
     isLoggedIn();
+    toast('Deleting Message...', toastSuccess);
     const requestURL = `/api/v1/entries/${storyID}`;
     await fetchRequest(requestURL, 'DELETE');
-    toast('Message Deleted', toastSuccess);
+    toast('Message Deleted', toastSuccess, 7000);
     window.location.replace('./dashboard.html');
   } catch (error) {
     window.location.replace(`./view-story.html?id=${storyID}`);
   }
-};
-
-const addCardListenter = () => {
-  Array.from(storyWrapper.children).forEach(child => {
-    child.addEventListener('click', () => {
-      const storyID = child.getAttribute('data-id');
-      window.location.href = `./view-story.html?id=${storyID}`;
-    });
-  });
-};
-
-// Load Stories
-const loadStories = async () => {
-  const response = await fetchRequest('/api/v1/entries/');
-  if (response.message) {
-    const message = createNode('p', 'diary-message', response.message);
-    storyWrapper.parentNode.insertBefore(message, storyWrapper);
-  } else {
-    response.forEach(diary => {
-      createCards(diary);
-    });
-    addCardListenter();
-  }
-};
-
-const inifiteScroll = () => {
-  let atLastPost = false;
-  if (atLastPost === false) {
-    window.addEventListener('scroll', async () => {
-      if (window.innerHeight + window.scrollY >= document.body.scrollHeight) {
-        const id = storyWrapper.lastChild.getAttribute('data-id');
-        if (atLastPost !== true) {
-          const response = await fetchRequest(`api/v1/entries?id=${id}`);
-          if (response.message) {
-            atLastPost = true;
-            const message = createNode('p', 'diary-message', response.message);
-            document.querySelector('.diary').appendChild(message);
-            return;
-          }
-          response.forEach(diary => {
-            createCards(diary);
-          });
-          addCardListenter();
-        }
-      }
-    });
-  }
-};
-
-// View Strory
-const viewStory = async () => {
-  const viewWrapper = document.querySelector('.view-card');
-  try {
-    const diaryID = new URLSearchParams(window.location.search).get('id');
-    const response = await fetchRequest(`/api/v1/entries/${diaryID}`);
-    if (response.status) {
-      throw new Error(response.statusText);
-    }
-    const dateCreated = new Date(response.created_on).getTime();
-    const difference = (new Date().getTime() - dateCreated) / (1000 * 60 * 60);
-    const cardTitle = createNode('p', 'view-card-title', response.title);
-    const cardDate = createNode(
-      'span',
-      'view-card-date',
-      new Date(response.created_on).toDateString()
-    );
-    const cardBody = createNode('p', 'view-card-body', response.content);
-    const cardAction = createNode('span', 'view-card-actions');
-    const cardDelete = createNode('a', 'view-del-btn', 'Delete Story');
-    cardDelete.setAttribute('href', '#infopanel');
-    const cardEdit = createNode('button', 'view-edit-btn', 'Edit Story');
-
-    if (difference > 24) {
-      cardEdit.disabled = true;
-      cardEdit.textContent = 'Edit Disabled';
-      cardEdit.style.background = '#c5c5c5';
-      cardEdit.style.cursor = 'not-allowed';
-    }
-
-    append(cardAction, cardDelete);
-    append(cardAction, cardEdit);
-    append(viewWrapper, cardTitle);
-    append(viewWrapper, cardDate);
-    append(viewWrapper, cardBody);
-    append(viewWrapper, cardAction);
-
-    const editStoryBtn = document.querySelector('.view-edit-btn');
-    editStoryBtn.addEventListener('click', updateStory);
-  } catch (error) {
-    const cardBody = createNode('p');
-    cardBody.className = 'view-card-body';
-    cardBody.textContent = `Ooops - Dairy ${error}`;
-    append(viewWrapper, cardBody);
-  }
-};
-/* Notification Functionality */
-const checkSwSupport = e => {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    toast('Service Worker not Supported in your Browser', toastErr);
-    e.target.checked = false;
-    return false;
-  }
-  return true;
-};
-
-const askPermission = async e => {
-  const permission = await Notification.requestPermission();
-  if (permission !== 'granted') {
-    e.target.checked = false;
-    return false;
-  }
-  return true;
-};
-
-const subscribeUser = async () => {
-  const swRegistration = await navigator.serviceWorker.register('./sw.js', { scope: '/' });
-  let subscription = await swRegistration.pushManager.getSubscription();
-  subscription.unsubscribe();
-  subscription = await swRegistration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(publicVapid)
-  });
-  return subscription;
 };
 
 // Notification Settings
@@ -298,77 +372,7 @@ const setUpNotification = async e => {
   }
 };
 
-// Register User
-const registerUser = async e => {
-  try {
-    e.preventDefault();
-    const email = document.querySelector('#reg-email').value;
-    const fullname = document.querySelector('#reg-fullname').value;
-    const password = document.querySelector('#reg-password').value;
-    // Fetch URL
-    const signUpURI = '/api/v1/auth/signup';
-    const signUpInfo = JSON.stringify({ email, fullname, password });
-    const response = await fetchRequest(signUpURI, 'POST', signUpInfo);
-    if (!response.token) {
-      throw new Error(response.message);
-    }
-    localStorage.setItem('token', response.token);
-    window.location.replace('./dashboard.html');
-  } catch (error) {
-    toast(error, toastErr);
-  }
-};
-
-// Login User
-const loginUser = async e => {
-  try {
-    e.preventDefault();
-    const email = document.querySelector('#login-email').value;
-    const password = document.querySelector('#login-password').value;
-    const loginInfo = JSON.stringify({ email, password });
-    const loginURI = '/api/v1/auth/login';
-    const response = await fetchRequest(loginURI, 'POST', loginInfo);
-    if (!response.token) {
-      throw new Error(response.message);
-    }
-    localStorage.setItem('token', response.token);
-    window.location.replace('./dashboard.html');
-  } catch (error) {
-    toast(error, toastErr);
-  }
-};
-
-// Logout User
-const logoutUser = e => {
-  e.preventDefault();
-  // Delete token
-  localStorage.clear();
-  // Redirect User
-  window.location.href = './';
-};
-
-// Create Story
-const createStory = async e => {
-  try {
-    e.preventDefault();
-    isLoggedIn();
-    const title = document.querySelector('.diary-title').value;
-    const content = document.querySelector('.diary-content').value;
-    const newStoryInput = JSON.stringify({ title, content });
-    const newStoryURI = '/api/v1/entries';
-    toast('Creating Your Story...', toastErr);
-    const response = await fetchRequest(newStoryURI, 'POST', newStoryInput);
-    if (!response.result) {
-      // Gets this from the validateInput.js Middleware
-      throw new Error(response.message[0]);
-    }
-    toast(response.message, toastSuccess);
-    window.location.replace(`./view-story.html?id=${response.result.id}`);
-  } catch (error) {
-    toast(error, toastErr);
-  }
-};
-
+// Load Prfile
 const loadProfile = async () => {
   isLoggedIn();
   const fullname = document.querySelector('.profile__name');
@@ -399,9 +403,8 @@ switch (currentPage) {
     if (localStorage.getItem('token')) window.location.replace('./dashboard.html');
     break;
   case '/dashboard.html':
-    isLoggedIn();
     loadStories();
-    inifiteScroll();
+    infiniteScroll();
     break;
   case '/new-story.html':
     isLoggedIn();
