@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,20 +10,25 @@
 </head>
 
 <body class="is__gradient">
-  
-    <header class="header">
-      <nav class="nav container">
-        <a href="./" class="nav-logo">My Diary</a>
-        <ul>
-          <li class="nav-menu-item">
-            <a href="./">Home</a>
+  <header class="header">
+    <div class="container">
+      <nav class="nav">
+        <a href="./" class="nav__logo">md</a>
+        <ul class="nav__menu">
+          <li class="menu__item">
+            <a href="./register.html">Create Account</a>
+          </li>
+          <li class="menu__item">
+            <a href="./login.html">Login</a>
           </li>
         </ul>
       </nav>
-    </header>
+    </div>
+  </header>
 
-    <main class="main container">
-      <section class="form">
+  <main class="main">
+    <section class="form__wrapper">
+      <div class="form">
         <p class="form__header">Login with your account.</p>
         <form id="login-form" class="form__login">
           <ul class="error-container"></ul>
@@ -39,13 +45,14 @@
             <a href="./register.html">Sign Up</a>
           </span>
         </form>
-      </section>
-    </main>
+      </div>
+    </section>
+  </main>
 
-    <footer class="footer">
-      <p>My Diary
-        <span>&copy;</span> 2018</p>
-    </footer>
+  <footer class="footer">
+    <p>My Diary
+      <span>&copy;</span> 2018</p>
+  </footer>
   <script src="./js/app.js"></script>
 </body>
 

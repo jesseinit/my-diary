@@ -250,14 +250,22 @@ img {
 }
 
 /* FORM STYLES */
+.form__wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
 .form {
-  margin-top: 70px;
-  margin-left: auto;
-  margin-right: auto;
+  display: flex;
+  justify-content: center;
   width: 100%;
   background: #fff;
   box-shadow: 0 5px 20px -5px rgba(0, 0, 0, 0.5);
   transition: width 1s ease;
+  flex-direction: column;
 }
 .form__header {
   margin-bottom: 15px;
