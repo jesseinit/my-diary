@@ -9,46 +9,50 @@
   <title>Register - My Diary</title>
 </head>
 
-<body class="is__gradient">
+<body>
   <header class="header">
-    <nav class="nav container">
-      <a href="./" class="nav-logo">My Diary</a>
-      <ul>
-        <li class="nav-menu-item">
-          <a href="./">Home</a>
-        </li>
-      </ul>
-    </nav>
+    <div class="container">
+      <nav class="nav">
+        <a href="./" class="nav__logo">md</a>
+        <ul class="nav__menu">
+          <li class="menu__item">
+            <a href="./login.html">Login</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
   <main class="main container">
-    <section class="form">
-      <p class="form__header">Create a new account.</p>
-      <form id="signup-form" class="form__signup">
-        <ul class="error-container"></ul>
-        <div class="form__control">
-          <input type="text" id="reg-fullname" class="form__input" placeholder="Full Name">
-        </div>
+    <section class="form__wrapper">
+      <div class="form">
+        <p class="form__header">Create a new account.</p>
+        <form id="signup-form" class="form__signup">
+          <ul class="error-container"></ul>
+          <div class="form__control">
+            <input type="text" id="reg-fullname" class="form__input" placeholder="Full Name">
+          </div>
 
-        <div class="form__control">
-          <input type="email" id="reg-email" class="form__input" placeholder="Email Address" required>
-        </div>
+          <div class="form__control">
+            <input type="email" id="reg-email" class="form__input" placeholder="Email Address" required>
+          </div>
 
-        <div class="form__control">
-          <input type="password" id="reg-password" class="form__input" placeholder="Password">
-        </div>
+          <div class="form__control">
+            <input type="password" id="reg-password" class="form__input" placeholder="Password">
+          </div>
 
-        <div class="form__control">
-          <input type="password" id="reg-confirm-password" class="form__input" placeholder="Confirm Password">
-        </div>
+          <div class="form__control">
+            <input type="password" id="reg-confirm-password" class="form__input" placeholder="Confirm Password">
+          </div>
 
-        <div class="form__control">
-          <button type="submit" class="btn btn__primary is__fullwd">Sign Up</button>
-        </div>
-        <span>Already have a My Diary account?
-          <a href="./login.html">Sign In</a>
-        </span>
-      </form>
+          <div class="form__control">
+            <button type="submit" class="btn btn__primary is__fullwd">Sign Up</button>
+          </div>
+          <span>Already have a My Diary account?
+            <a href="./login.html">Sign In</a>
+          </span>
+        </form>
+      </div>
     </section>
   </main>
 
