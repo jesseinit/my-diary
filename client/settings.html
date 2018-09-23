@@ -12,29 +12,34 @@
 <body class="is__gradient">
 
   <header class="header">
-    <nav class="nav container">
-      <a href="./dashboard.html" class="nav-logo">My Diary</a>
-      <ul class="nav-menu">
-        <li class="nav-menu-item">
-          <a href="./dashboard.html">My Dashboard</a>
-        </li>
-        <li class="nav-menu-item">
-          <a id="logout">Logout</a>
-        </li>
-      </ul>
-    </nav>
+    <div class="container">
+      <nav class="nav">
+        <a href="./dashboard.html" class="nav__logo">md</a>
+        <ul class="nav__menu">
+          <li class="menu__item">
+            <a class="btn btn__primary btn--small" href="./new-story.html">New Story</a>
+          </li>
+          <li class="menu__item">
+            <a href="./dashboard.html">Dashboard</a>
+          </li>
+          <li class="menu__item">
+            <a id="logout">Logout</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
   <main class="main container js__settings">
     <section class="profile">
-        <p class="profile__name"></p>
-        <div class="profile__stats">
-          <p>Date Registered <span class="profile__date">01-01-2018</span></p>
-          <p>Total Post <span class="profile__count">0 Post</span></p>
-        </div>
-        <div class="profile__setting">
-          <span>Notification Setting:</span> <input type="checkbox">
-        </div>
+      <p class="profile__name"></p>
+      <div class="profile__stats">
+        <p>Date Registered <span class="profile__date">01-01-2018</span></p>
+        <p>Total Post <span class="profile__count">0 Post</span></p>
+      </div>
+      <div class="profile__setting">
+        <span>Notification Setting:</span> <input type="checkbox">
+      </div>
     </section>
   </main>
 

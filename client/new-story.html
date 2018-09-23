@@ -11,31 +11,34 @@
 
 <body class="is__gradient">
   <header class="header">
-    <nav class="nav container">
-      <a href="./dashboard.html" class="nav-logo">My Diary</a>
-      <ul class="nav-menu">
-        <li class="nav-menu-item">
-          <a href="./dashboard.html">My Dashboard</a>
-        </li>
-        <li class="nav-menu-item">
-          <a id="logout">Logout</a>
-        </li>
-      </ul>
-    </nav>
+    <div class="container">
+      <nav class="nav">
+        <a href="./dashboard.html" class="nav__logo">md</a>
+        <ul class="nav__menu">
+          <li class="menu__item">
+            <a href="./dashboard.html">Dashboard</a>
+          </li>
+          <li class="menu__item">
+            <a href="./settings.html">Profile</a>
+          </li>
+          <li class="menu__item">
+            <a id="logout">Logout</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <main class="main js__newstory">
+  <main class="">
     <section class="container">
       <form id="newstory-form">
-        <div class="diary-form-wrapper-container">
-          <div>
-            <input class="diary-title" type="text" placeholder="Title">
-          </div>
-          <div>
-            <textarea class="diary-content" cols="30" rows="10" placeholder="What is it about?"></textarea>
-          </div>
-          <button class="diary-button" type="submit">Save Diary</button>
+        <div>
+          <input class="diary__title" type="text" placeholder="Title">
         </div>
+        <div>
+          <textarea class="diary__content" cols="30" rows="10" placeholder="What is it about?"></textarea>
+        </div>
+        <button class="btn btn__primary btn--right" type="submit">Save Diary</button>
       </form>
     </section>
   </main>

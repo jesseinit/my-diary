@@ -9,34 +9,40 @@
   <title>View Story - My Diary</title>
 </head>
 
-<body class="is__gradient">
-
+<body>
   <header class="header">
-    <nav class="nav container">
-      <a href="./dashboard.html" class="nav-logo">My Diary</a>
-      <ul class="nav-menu">
-        <li class="nav-menu-item">
-          <a href="./dashboard.html">My Dashboard</a>
-        </li>
-        <li class="nav-menu-item">
-          <a id="logout">Logout</a>
-        </li>
-      </ul>
-    </nav>
+    <div class="container">
+      <nav class="nav">
+        <a href="./dashboard.html" class="nav__logo">md</a>
+        <ul class="nav__menu">
+          <li class="menu__item">
+            <a class="btn btn__primary btn--small" href="./new-story.html">New Story</a>
+          </li>
+          <li class="menu__item">
+              <a href="./dashboard.html">Dashboard</a>
+            </li>
+          <li class="menu__item">
+            <a href="./settings.html">Profile</a>
+          </li>
+          <li class="menu__item">
+            <a id="logout">Logout</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
   </header>
+
   <main class="main js__viewstory">
     <div id="infopanel" class="delete-modal">
       <div class="content">
         <p class="content__title">Do you want to Delete this Story?</p>
         <div class="content__btn">
-            <a href="#" class="delete-confirm">Yes</a>
-            <a href="#" class="delete-cancel">No</a>
+          <a href="#" class="delete-confirm">Yes</a>
+          <a href="#" class="delete-cancel">No</a>
         </div>
       </div>
     </div>
-    <br>
-    <br>
-    <section class="view-card container"></section>
+    <section class="view__card container"></section>
   </main>
   <footer class="footer">
     <p>Made with &#10084; by Jesse</p>

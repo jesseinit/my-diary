@@ -3,10 +3,9 @@ import { body, param, validationResult } from 'express-validator/check';
 const signUp = [
   body('email')
     .isEmail()
-    .isLength({ max: 100 })
-    .withMessage('Please enter a valid email'),
+    .withMessage('Hello')
+    .isLength({ max: 100 }),
   body('fullname')
-    .isString()
     .isLength({ min: 2 })
     .withMessage('Fullname should contain at least two characters'),
   body('password')
@@ -17,8 +16,10 @@ const signUp = [
 const logIn = [
   body('email')
     .isEmail()
+    .withMessage('Please enter a valid email')
     .isLength({ max: 100 })
-    .withMessage('Please enter a valid email'),
+    .withMessage('Please enter a email less than 100 characters'),
+  // .withMessage('Please enter a valid email')
   body('password')
     .isLength({ min: 6 })
     .withMessage('Password should contain atleast 6 characters')
@@ -39,7 +40,7 @@ const post = [
 const validationHandler = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.status(422).json({ message: errors.array().map(error => error.msg) });
+    res.status(422).json({ error: errors.array().map(error => error.msg) });
   } else {
     next();
   }

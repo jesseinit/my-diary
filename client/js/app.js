@@ -1,10 +1,13 @@
 const signUpForm = document.querySelector('#signup-form');
 const loginForm = document.querySelector('#login-form');
 const storyWrapper = document.querySelector('.diary__cards');
+const diarySection = document.querySelector('.diary');
 const newStoryForm = document.querySelector('#newstory-form');
 const logoutBtn = document.querySelector('#logout');
 const deleteStoryBtn = document.querySelector('.delete-confirm');
 const notification = document.querySelector('.profile__setting input');
+const cardImage =
+  'linear-gradient(rgba(0,0,0, 0.3), rgba(0,0,0, 0.3)), url(https://picsum.photos/425/69?random)';
 const toastErr = 'toast--error';
 const toastSuccess = 'toast--success';
 const publicVapid =
@@ -36,6 +39,7 @@ const createCards = diary => {
   const card = createNode('div', 'diary-card');
   card.setAttribute('data-id', diary.id);
   const cardTitle = createNode('p', 'diary-card-title', diary.title);
+  cardTitle.style.backgroundImage = cardImage;
   const cardBody = createNode('p', 'diary-card-body', diary.content);
   const cardInfo = createNode('div', 'diary-card-info');
   const cardDate = createNode('span', 'diary-card-date', new Date(diary.created_on).toDateString());
@@ -124,6 +128,23 @@ const subscribeUser = async () => {
   });
   return subscription;
 };
+
+const handleInputErrors = response => {
+  const ul = createNode('ul', 'error__container');
+  const form = document.querySelector('.form__login');
+  if (form.children[0].classList.contains('error__container')) {
+    form.removeChild(form.children[0]);
+  }
+  if (response.message) {
+    toast(response.message, toastErr);
+  } else {
+    response.error.forEach(msg => {
+      const li = createNode('li', '', msg);
+      append(ul, li);
+      form.insertBefore(ul, form.children[0]);
+    });
+  }
+};
 /* END OF UTILITY FUNCTIONS */
 
 // Register User
@@ -142,15 +163,15 @@ const registerUser = async e => {
     const signUpInfo = JSON.stringify({ email, fullname, password });
     const response = await fetchRequest(signUpURI, 'POST', signUpInfo);
     if (!response.token) {
-      throw new Error(response.message);
+      handleInputErrors(response);
+    } else {
+      localStorage.setItem('token', response.token);
+      window.location.replace('./dashboard.html');
     }
-    localStorage.setItem('token', response.token);
-    window.location.replace('./dashboard.html');
   } catch (error) {
     toast('There has been an error from your input', toastErr);
   }
 };
-
 // Login User
 const loginUser = async e => {
   try {
@@ -161,10 +182,11 @@ const loginUser = async e => {
     const loginURI = '/api/v1/auth/login';
     const response = await fetchRequest(loginURI, 'POST', loginInfo);
     if (!response.token) {
-      throw new Error(response.message);
+      handleInputErrors(response);
+    } else {
+      localStorage.setItem('token', response.token);
+      window.location.replace('./dashboard.html');
     }
-    localStorage.setItem('token', response.token);
-    window.location.replace('./dashboard.html');
   } catch (error) {
     toast(error, toastErr);
   }
@@ -183,11 +205,14 @@ const loadStories = async () => {
   const response = await fetchRequest('/api/v1/entries/');
   if (!response.data) {
     const message = createNode('p', 'diary-message', 'You have not created any diaries yet');
-    storyWrapper.parentNode.insertBefore(message, storyWrapper);
+    const writeStoryBtn = createNode('a', 'btn', 'Write a Story');
+    writeStoryBtn.classList.add('btn__primary');
+    writeStoryBtn.classList.add('btn--centered');
+    writeStoryBtn.setAttribute('href', './new-story.html');
+    diarySection.insertBefore(message, diarySection.children[0]);
+    diarySection.insertBefore(writeStoryBtn, diarySection.children[1]);
   } else {
-    response.data.forEach(diary => {
-      createCards(diary);
-    });
+    response.data.forEach(diary => createCards(diary));
     addCardListenter();
   }
 };
@@ -208,9 +233,7 @@ const infiniteScroll = () => {
             document.querySelector('.diary').appendChild(message);
             return;
           }
-          response.data.forEach(diary => {
-            createCards(diary);
-          });
+          response.data.forEach(diary => createCards(diary));
           addCardListenter();
         }
       }
@@ -223,8 +246,8 @@ const createStory = async e => {
   try {
     e.preventDefault();
     isLoggedIn();
-    const title = document.querySelector('.diary-title').value;
-    const content = document.querySelector('.diary-content').value;
+    const title = document.querySelector('.diary__title').value;
+    const content = document.querySelector('.diary__content').value;
     const newStoryInput = JSON.stringify({ title, content });
     const newStoryURI = '/api/v1/entries';
     toast('Creating Your Story...', toastErr);
@@ -250,8 +273,8 @@ const updateStory = async e => {
     const storyID = new URLSearchParams(window.location.search).get('id');
     // Update Story Endpoint URL
     const updateEndpoint = `/api/v1/entries/${storyID}`;
-    const storyTitle = document.querySelector('.view-card-title');
-    const storyContent = document.querySelector('.view-card-body');
+    const storyTitle = document.querySelector('.vcard__title');
+    const storyContent = document.querySelector('.vcard__body');
     if (e.target.textContent === 'Edit Story') {
       e.target.textContent = 'Save Update';
       storyTitle.focus();
@@ -274,13 +297,13 @@ const updateStory = async e => {
       toast('Story Has Been Updated', toastSuccess, 7000);
     }
   } catch (error) {
-    toast('Error Updating Story', toastErr, 3000);
+    toast(error, toastErr, 3000);
   }
 };
 
 // View Strory
 const viewStory = async () => {
-  const viewWrapper = document.querySelector('.view-card');
+  const viewWrapper = document.querySelector('.view__card');
   try {
     const diaryID = new URLSearchParams(window.location.search).get('id');
     let response = await fetchRequest(`/api/v1/entries/${diaryID}`);
@@ -290,17 +313,17 @@ const viewStory = async () => {
     response = response.data;
     const dateCreated = new Date(response.created_on).getTime();
     const difference = (new Date().getTime() - dateCreated) / (1000 * 60 * 60);
-    const cardTitle = createNode('p', 'view-card-title', response.title);
+    const cardTitle = createNode('p', 'vcard__title', response.title);
     const cardDate = createNode(
       'span',
-      'view-card-date',
+      'vcard__date',
       new Date(response.created_on).toDateString()
     );
-    const cardBody = createNode('div', 'view-card-body', response.content);
-    const cardAction = createNode('span', 'view-card-actions');
-    const cardDelete = createNode('a', 'view-del-btn', 'Delete Story');
+    const cardBody = createNode('div', 'vcard__body', response.content);
+    const cardAction = createNode('span', 'vcard__actions');
+    const cardDelete = createNode('a', 'vdel__btn', 'Delete Story');
     cardDelete.setAttribute('href', '#infopanel');
-    const cardEdit = createNode('button', 'view-edit-btn', 'Edit Story');
+    const cardEdit = createNode('button', 'vedit__btn', 'Edit Story');
     if (difference > 24) {
       cardEdit.disabled = true;
       cardEdit.textContent = 'Edit Disabled';
@@ -313,11 +336,11 @@ const viewStory = async () => {
     append(viewWrapper, cardDate);
     append(viewWrapper, cardBody);
     append(viewWrapper, cardAction);
-    const editStoryBtn = document.querySelector('.view-edit-btn');
+    const editStoryBtn = document.querySelector('.vedit__btn');
     editStoryBtn.addEventListener('click', updateStory);
   } catch (error) {
     const cardBody = createNode('p');
-    cardBody.className = 'view-card-body';
+    cardBody.className = 'vcard__body';
     cardBody.textContent = `Ooops - Dairy was not found`;
     append(viewWrapper, cardBody);
   }
@@ -355,7 +378,7 @@ const setUpNotification = async e => {
       toast('You have subscribed to Push Notification', toastSuccess);
     } catch (error) {
       e.target.checked = false;
-      toast(error, toastErr);
+      toast('An error has occured...Try again later', toastErr, 6000);
     }
   } else {
     try {
@@ -367,7 +390,7 @@ const setUpNotification = async e => {
       toast('You have Unsubscribed to Push Notification', toastSuccess);
     } catch (error) {
       e.target.checked = true;
-      toast(error, toastErr);
+      toast('An error has occured...Try again later', toastErr);
     }
   }
 };
@@ -399,7 +422,7 @@ if (notification) notification.addEventListener('change', setUpNotification);
 
 const currentPage = window.location.pathname;
 switch (currentPage) {
-  case '/index.html':
+  case '/':
     if (localStorage.getItem('token')) window.location.replace('./dashboard.html');
     break;
   case '/dashboard.html':

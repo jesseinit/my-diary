@@ -9,25 +9,29 @@
   <title>Dashboard - My Diary</title>
 </head>
 
-<body class="is__gradient js__dashboard">
+<body>
   <header class="header">
-    <nav class="nav container">
-      <a href="./dashboard.html" class="nav-logo">My Diary</a>
-      <ul class="nav-menu">
-        <li class="nav-menu-item">
-          <a href="./settings.html">My Settings</a>
-        </li>
-        <li class="nav-menu-item">
-          <a id="logout">Logout</a>
-        </li>
-      </ul>
-    </nav>
+    <div class="container">
+      <nav class="nav">
+        <a href="./dashboard.html" class="nav__logo">md</a>
+        <ul class="nav__menu">
+          <li class="menu__item">
+            <a class="btn btn__primary btn--small" href="./new-story.html">New Story</a>
+          </li>
+          <li class="menu__item">
+            <a href="./settings.html">Profile</a>
+          </li>
+          <li class="menu__item">
+            <a id="logout">Logout</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
   </header>
+
   <main class="container">
-    <a style="margin-top: 10px;" href="./new-story.html" class="btn btn__primary">Write Story</a>
     <section class="diary">
-      <div class="diary__cards">
-      </div>
+      <div class="diary__cards"></div>
     </section>
   </main>
   <footer class="footer">
