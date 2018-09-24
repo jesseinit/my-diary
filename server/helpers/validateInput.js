@@ -3,7 +3,7 @@ import { body, param, validationResult } from 'express-validator/check';
 const signUp = [
   body('email')
     .isEmail()
-    .withMessage('Hello')
+    .withMessage('Please enter a valid email address')
     .isLength({ max: 100 }),
   body('fullname')
     .isLength({ min: 2 })

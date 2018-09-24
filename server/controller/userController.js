@@ -47,7 +47,7 @@ class User {
       const { email, password } = req.body;
       const usersFound = await pool.query(query.findUser(email));
       if (usersFound.rows.length < 1) {
-        res.status(404).send({ message: 'No associated account with that email. 😩' });
+        res.status(404).send({ message: 'No associated account with this email. 😩' });
         return;
       }
       const isPasswordValid = await bcrypt.compare(password, usersFound.rows[0].password);

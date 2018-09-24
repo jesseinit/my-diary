@@ -1,3 +1,4 @@
+const formSubmitBtn = document.querySelector('.form .btn');
 const signUpForm = document.querySelector('#signup-form');
 const loginForm = document.querySelector('#login-form');
 const storyWrapper = document.querySelector('.diary__cards');
@@ -129,14 +130,16 @@ const subscribeUser = async () => {
   return subscription;
 };
 
-const handleInputErrors = response => {
+const handleInputErrors = (response, formClass) => {
   const ul = createNode('ul', 'error__container');
-  const form = document.querySelector('.form__login');
+  const form = document.querySelector(formClass);
   if (form.children[0].classList.contains('error__container')) {
     form.removeChild(form.children[0]);
   }
   if (response.message) {
-    toast(response.message, toastErr);
+    const li = createNode('li', '', response.message);
+    append(ul, li);
+    form.insertBefore(ul, form.children[0]);
   } else {
     response.error.forEach(msg => {
       const li = createNode('li', '', msg);
@@ -151,44 +154,51 @@ const handleInputErrors = response => {
 const registerUser = async e => {
   try {
     e.preventDefault();
+    formSubmitBtn.classList.add('spinning');
     const email = document.querySelector('#reg-email').value;
     const fullname = document.querySelector('#reg-fullname').value;
     const password = document.querySelector('#reg-password').value;
     const confirmPassword = document.querySelector('#reg-confirm-password').value;
     if (password !== confirmPassword) {
       toast('Your password are not matching', toastErr);
+      formSubmitBtn.classList.remove('spinning');
       return;
     }
     const signUpURI = '/api/v1/auth/signup';
     const signUpInfo = JSON.stringify({ email, fullname, password });
     const response = await fetchRequest(signUpURI, 'POST', signUpInfo);
     if (!response.token) {
-      handleInputErrors(response);
-    } else {
-      localStorage.setItem('token', response.token);
-      window.location.replace('./dashboard.html');
+      handleInputErrors(response, '.form__signup');
+      formSubmitBtn.classList.remove('spinning');
+      return;
     }
+    localStorage.setItem('token', response.token);
+    window.location.replace('./dashboard.html');
   } catch (error) {
     toast('There has been an error from your input', toastErr);
+    formSubmitBtn.classList.remove('spinning');
   }
 };
 // Login User
 const loginUser = async e => {
   try {
     e.preventDefault();
+    formSubmitBtn.classList.add('spinning');
     const email = document.querySelector('#login-email').value;
     const password = document.querySelector('#login-password').value;
     const loginInfo = JSON.stringify({ email, password });
     const loginURI = '/api/v1/auth/login';
     const response = await fetchRequest(loginURI, 'POST', loginInfo);
     if (!response.token) {
-      handleInputErrors(response);
-    } else {
-      localStorage.setItem('token', response.token);
-      window.location.replace('./dashboard.html');
+      handleInputErrors(response, '.form__login');
+      formSubmitBtn.classList.remove('spinning');
+      return;
     }
+    localStorage.setItem('token', response.token);
+    window.location.replace('./dashboard.html');
   } catch (error) {
-    toast(error, toastErr);
+    toast('There has been an error from your input', toastErr);
+    formSubmitBtn.classList.remove('spinning');
   }
 };
 
