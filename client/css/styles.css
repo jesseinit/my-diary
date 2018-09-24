@@ -22,7 +22,7 @@
   background-color: #fc6e4f;
 }
 .btn--small {
-  padding: 7px;
+  padding: 5px 10px;
 }
 .btn--danger {
   background-color: #f8d6d6;
@@ -167,7 +167,7 @@ img {
   text-decoration: none;
   font-weight: 300;
   color: #000;
-  border-radius: 5px;
+  border-radius: 3px;
   transition: color 0.2s ease;
 }
 .nav .menu__item a:hover {
@@ -565,8 +565,14 @@ img {
 .vedit__btn {
   font-family: inherit;
   order: -1;
-  border: 1px solid transparent;
+  border: none;
+  outline: none;
   background: #fc6240;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.2);
+  transition: box-shadow .2s ease-in-out;
+}
+.vedit__btn:hover {
+  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.2);
 }
 
 .delete-modal {
@@ -686,12 +692,12 @@ img {
   transform: translate(50%);
   z-index: 10;
   height: 45px;
-  width: 100%;
+  width: 90%;
+  border-radius: 5px;
   padding: 0 20px;
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 .toast p {
   font-weight: 400;
@@ -701,14 +707,14 @@ img {
   animation-name: toastAnimation;
   animation-duration: 0.3s;
   animation-timing-function: linear;
-  top: 45px;
+  top: 50px;
   color: #000;
 }
 .toast--error {
   background: #f58383;
 }
 .toast--success {
-  background: #1aff1a;
+  background: #6beb6b;
 }
 
 /* KeyFrames */
@@ -719,7 +725,7 @@ img {
   }
   50% {
     opacity: 1;
-    top: 45px;
+    top: 50px;
   }
 }
 @keyframes rotate360 {

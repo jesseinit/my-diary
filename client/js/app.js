@@ -155,6 +155,7 @@ const registerUser = async e => {
   try {
     e.preventDefault();
     formSubmitBtn.classList.add('spinning');
+    formSubmitBtn.textContent = 'Running Checks';
     const email = document.querySelector('#reg-email').value;
     const fullname = document.querySelector('#reg-fullname').value;
     const password = document.querySelector('#reg-password').value;
@@ -162,6 +163,7 @@ const registerUser = async e => {
     if (password !== confirmPassword) {
       toast('Your password are not matching', toastErr);
       formSubmitBtn.classList.remove('spinning');
+      formSubmitBtn.textContent = 'Sign Up';
       return;
     }
     const signUpURI = '/api/v1/auth/signup';
@@ -170,13 +172,17 @@ const registerUser = async e => {
     if (!response.token) {
       handleInputErrors(response, '.form__signup');
       formSubmitBtn.classList.remove('spinning');
+      formSubmitBtn.textContent = 'Sign Up';
       return;
     }
+    formSubmitBtn.classList.remove('spinning');
+    toast(response.message, toastSuccess);
     localStorage.setItem('token', response.token);
     window.location.replace('./dashboard.html');
   } catch (error) {
     toast('There has been an error from your input', toastErr);
     formSubmitBtn.classList.remove('spinning');
+    formSubmitBtn.textContent = 'Sign Up';
   }
 };
 // Login User
@@ -194,6 +200,8 @@ const loginUser = async e => {
       formSubmitBtn.classList.remove('spinning');
       return;
     }
+    toast(response.message, toastSuccess);
+    formSubmitBtn.classList.remove('spinning');
     localStorage.setItem('token', response.token);
     window.location.replace('./dashboard.html');
   } catch (error) {
@@ -253,7 +261,7 @@ const infiniteScroll = () => {
 
 // Create Story
 const createStory = async e => {
-  const createStoryBtn = document.querySelector('#newstory-form btn');
+  const createStoryBtn = document.querySelector('#newstory-form .btn');
   try {
     e.preventDefault();
     isLoggedIn();
@@ -363,10 +371,9 @@ const viewStory = async () => {
 };
 
 // Delete Story
-const deleteStory = async e => {
+const deleteStory = async () => {
   const storyID = new URLSearchParams(window.location.search).get('id');
   try {
-    e.preventDefault();
     isLoggedIn();
     toast('Deleting Message...', toastSuccess);
     const requestURL = `/api/v1/entries/${storyID}`;
