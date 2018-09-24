@@ -563,6 +563,7 @@ img {
 }
 
 .vedit__btn {
+  font-family: inherit;
   order: -1;
   border: 1px solid transparent;
   background: #fc6240;

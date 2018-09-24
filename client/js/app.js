@@ -253,24 +253,30 @@ const infiniteScroll = () => {
 
 // Create Story
 const createStory = async e => {
+  const createStoryBtn = document.querySelector('#newstory-form btn');
   try {
     e.preventDefault();
     isLoggedIn();
+    createStoryBtn.classList.add('spinning');
     const title = document.querySelector('.diary__title').value;
     const content = document.querySelector('.diary__content').value;
     const newStoryInput = JSON.stringify({ title, content });
     const newStoryURI = '/api/v1/entries';
-    toast('Creating Your Story...', toastErr);
+    createStoryBtn.textContent = 'Creating Your Story...';
     const response = await fetchRequest(newStoryURI, 'POST', newStoryInput);
     if (!response.data) {
       // Gets this from the validateInput.js Middleware
       toast(response.message[0], toastErr);
+      createStoryBtn.classList.remove('spinning');
+      createStoryBtn.textContent = 'Save Diary';
       return;
     }
     toast(response.message, toastSuccess);
     window.location.replace(`./view-story.html?id=${response.data.id}`);
   } catch (error) {
     toast(error, toastErr);
+    createStoryBtn.classList.remove('spinning');
+    createStoryBtn.textContent = 'Save Diary';
   }
 };
 
