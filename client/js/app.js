@@ -1,3 +1,4 @@
+const spinner = document.querySelector('.loading__stories');
 const formSubmitBtn = document.querySelector('.form .btn');
 const signUpForm = document.querySelector('#signup-form');
 const loginForm = document.querySelector('#login-form');
@@ -8,7 +9,7 @@ const logoutBtn = document.querySelector('#logout');
 const deleteStoryBtn = document.querySelector('.delete-confirm');
 const notification = document.querySelector('.profile__setting input');
 const cardImage =
-  'linear-gradient(rgba(0,0,0, 0.3), rgba(0,0,0, 0.3)), url(https://picsum.photos/425/69?random)';
+  'linear-gradient(rgba(0,0,0, 0.8), rgba(0,0,0, 0.8)), url(https://picsum.photos/425/69?random)';
 const toastErr = 'toast--error';
 const toastSuccess = 'toast--success';
 const publicVapid =
@@ -72,8 +73,7 @@ const fetchRequest = async (url = '', method = 'GET', body = null) => {
 
 // Check Token Validity
 const isLoggedIn = async () => {
-  const response = await fetchRequest('/api/v1/entries/');
-  if (response.err) {
+  if (!localStorage.getItem('token')) {
     localStorage.clear();
     window.location.replace('./login.html');
   }
@@ -122,7 +122,9 @@ const askPermission = async e => {
 const subscribeUser = async () => {
   const swRegistration = await navigator.serviceWorker.register('./sw.js', { scope: '/' });
   let subscription = await swRegistration.pushManager.getSubscription();
-  subscription.unsubscribe();
+  if (subscription) {
+    subscription.unsubscribe();
+  }
   subscription = await swRegistration.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(publicVapid)
@@ -222,6 +224,7 @@ const loadStories = async () => {
   isLoggedIn();
   const response = await fetchRequest('/api/v1/entries/');
   if (!response.data) {
+    spinner.classList.add('hide');
     const message = createNode('p', 'diary-message', 'You have not created any diaries yet');
     const writeStoryBtn = createNode('a', 'btn', 'Write a Story');
     writeStoryBtn.classList.add('btn__primary');
@@ -230,6 +233,7 @@ const loadStories = async () => {
     diarySection.insertBefore(message, diarySection.children[0]);
     diarySection.insertBefore(writeStoryBtn, diarySection.children[1]);
   } else {
+    spinner.classList.add('hide');
     response.data.forEach(diary => createCards(diary));
     addCardListenter();
   }
@@ -242,11 +246,13 @@ const infiniteScroll = () => {
     window.addEventListener('scroll', async () => {
       isLoggedIn();
       if (window.innerHeight + window.scrollY >= document.body.scrollHeight) {
+        spinner.classList.remove('hide');
         const id = storyWrapper.lastChild.getAttribute('data-id');
         if (atLastPost !== true) {
           const response = await fetchRequest(`api/v1/entries?id=${id}`);
           if (!response.data) {
             atLastPost = true;
+            spinner.classList.add('hide');
             const message = createNode('p', 'diary-message', response.message);
             document.querySelector('.diary').appendChild(message);
             return;
@@ -255,6 +261,7 @@ const infiniteScroll = () => {
           addCardListenter();
         }
       }
+      spinner.classList.add('hide');
     });
   }
 };
@@ -343,7 +350,7 @@ const viewStory = async () => {
       'vcard__date',
       new Date(response.created_on).toDateString()
     );
-    const cardBody = createNode('div', 'vcard__body', response.content);
+    const cardBody = createNode('p', 'vcard__body', response.content);
     const cardAction = createNode('span', 'vcard__actions');
     const cardDelete = createNode('a', 'vdel__btn', 'Delete Story');
     cardDelete.setAttribute('href', '#infopanel');
