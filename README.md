@@ -6,7 +6,9 @@
 
 ## **My Diary**
 
-MyDiary is an online journal where users can pen down their thoughts and feelings.
+MyDiary is an online journal where users can pen down their thoughts and feelings. 
+
+### **Homepage** - [My Diary](https://jessdiary.herokuapp.com/)
 
 ## Technology and Tools Stack
 

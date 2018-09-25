@@ -73,7 +73,9 @@ const fetchRequest = async (url = '', method = 'GET', body = null) => {
 
 // Check Token Validity
 const isLoggedIn = async () => {
-  if (!localStorage.getItem('token')) {
+  // TODO: Implement better login check
+  const response = await fetchRequest('/api/v1/entries/');
+  if (response.err.name) {
     localStorage.clear();
     window.location.replace('./login.html');
   }

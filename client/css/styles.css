@@ -1,54 +1,6 @@
 /* VARIABLES */
 /* END OF VARIABLES */
-/* BUTTON STYLES */
-.btn {
-  display: inline-block;
-  position: relative;
-  font-family: inherit;
-  border: none;
-  outline: none;
-  font-size: 15px;
-  padding: 10px;
-  border-radius: 3px;
-  transition: padding-right .3s ease;
-  box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.1);
-}
-.btn__primary {
-  background-color: #fc5a36;
-  color: #fff;
-  transition: background-color 0.1s ease-in-out;
-}
-.btn__primary:hover {
-  background-color: #fc6e4f;
-}
-.btn--small {
-  padding: 5px 10px;
-}
-.btn--danger {
-  background-color: #f8d6d6;
-}
-.btn--centered {
-  margin-left: 50%;
-  transform: translate(-50%);
-}
-.btn--left {
-  float: left;
-}
-.btn--left::after {
-  content: '';
-  clear: both;
-  display: table;
-}
-.btn--right {
-  float: right;
-}
-.btn--right::after {
-  content: '';
-  clear: both;
-  display: table;
-}
-
-/* END OF BUTTON STYLES */
+@import url("https://fonts.googleapis.com/css?family=Montserrat:300,400,600,700");
 /* BASE STARTS */
 html {
   box-sizing: border-box;
@@ -735,6 +687,54 @@ img {
   position: absolute;
   border-right: 3px solid #f5ffc3;
   animation: rotate360 0.9s infinite linear, exist 0.1s forwards ease;
+}
+
+/* BUTTON STYLES */
+.btn {
+  display: inline-block;
+  position: relative;
+  font-family: inherit;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  padding: 10px;
+  border-radius: 3px;
+  transition: padding-right .3s ease;
+  box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.1);
+}
+.btn__primary {
+  background-color: #fc5a36;
+  color: #fff;
+  transition: background-color 0.1s ease-in-out;
+}
+.btn__primary:hover {
+  background-color: #fc6e4f;
+}
+.btn--small {
+  padding: 5px 10px;
+}
+.btn--danger {
+  background-color: #f8d6d6;
+}
+.btn--centered {
+  margin-left: 50%;
+  transform: translate(-50%);
+}
+.btn--left {
+  float: left;
+}
+.btn--left::after {
+  content: '';
+  clear: both;
+  display: table;
+}
+.btn--right {
+  float: right;
+}
+.btn--right::after {
+  content: '';
+  clear: both;
+  display: table;
 }
 
 /* KeyFrames */
