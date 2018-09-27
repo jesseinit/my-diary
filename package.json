@@ -14,7 +14,6 @@
     "test": "nyc --reporter=text-summary --reporter=html mocha --exit --require babel-register",
     "sass": "sass --watch --style expanded client/scss:client/css",
     "start": "npm run build && node ./build/app",
-    "sendNotification":"node ./build/helpers/notification",
     "dev": "nodemon --exec babel-node ./server/app.js --env",
     "coveralls": "nyc --reporter=text npm test"
   },
@@ -27,7 +26,9 @@
     "express-validator": "^5.3.0",
     "jsonwebtoken": "^8.3.0",
     "pg": "^7.4.3",
-    "web-push": "^3.3.3"
+    "swagger-ui-express": "^4.0.1",
+    "web-push": "^3.3.3",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "babel": "^6.23.0",

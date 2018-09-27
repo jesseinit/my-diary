@@ -19,7 +19,6 @@ const verifyAuthToken = (req, res, next) => {
     req.authUser = decodedToken;
     next();
   });
-  jwt.decode();
 };
 
 export default verifyAuthToken;

@@ -10,7 +10,7 @@ const signUp = [
     .withMessage('Fullname should contain at least two characters'),
   body('password')
     .isLength({ min: 6 })
-    .withMessage('Password should contain atleast 8 characters')
+    .withMessage('Password should contain atleast 6 characters')
 ];
 
 const logIn = [
@@ -19,7 +19,6 @@ const logIn = [
     .withMessage('Please enter a valid email')
     .isLength({ max: 100 })
     .withMessage('Please enter a email less than 100 characters'),
-  // .withMessage('Please enter a valid email')
   body('password')
     .isLength({ min: 6 })
     .withMessage('Password should contain atleast 6 characters')

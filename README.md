@@ -8,7 +8,8 @@
 
 MyDiary is an online journal where users can pen down their thoughts and feelings. 
 
-### **Homepage** - [My Diary](https://jessdiary.herokuapp.com/)
+#### **Homepage** - [My Diary](https://diaryly.herokuapp.com/) 
+#### **Documentation** - [Api Documentation](https://diaryly.herokuapp.com/api-docs)
 
 ## Technology and Tools Stack
 

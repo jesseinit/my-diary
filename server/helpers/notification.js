@@ -20,7 +20,7 @@ const sendNotification = async () => {
           title: `Hi ${user.fullname}`,
           body: 'Let every moment count. Write a diary of today in History'
         });
-        await webpush.sendNotification(subscription, payload);
+        await webpush.sendNotification(subscription, payload, { TTL: 43200 });
       });
     else {
       console.log('No User Subscribed Yet');

@@ -57,7 +57,7 @@ class User {
         });
         res.status(200).json({ message: 'Logged in successfuly', token });
       } else {
-        res.status(401).send({ message: 'Email or Password is not correct 😕' });
+        res.status(401).json({ message: 'Email or Password is not correct 😕' });
       }
     } catch (error) {
       res.status(500).json({ message: error });

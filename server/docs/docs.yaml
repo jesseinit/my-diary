@@ -1,0 +1,332 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: My Diary
+  description: 'MyDiary is an online journal where users can pen down their thoughts and feelings'
+host: https://diaryly.herokuapp.com/
+basePath: '/api/v1'
+schemes:
+  - https
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+tags:
+  - name: 'User'
+    description: 'Operations to be carried out on the users'
+  - name: 'Entries'
+    description: 'Operations to be carried out on the entries'
+paths:
+  /auth/signup:
+    post:
+      description: 'This endpoint creates a new user and persist the information to the database'
+      summary: 'Handles the creation of a new user account'
+      tags:
+        - User
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          description: "This is the request body object containing users' signup information"
+          schema:
+            $ref: '#/definitions/UserSignUprequest'
+      responses:
+        201:
+          description: 'User has been successfully registered'
+        409:
+          description: 'Email has been used by another user'
+        422:
+          description: 'The inputs from the user is not supported'
+        500:
+          description: 'Internal server error'
+  /auth/login:
+    post:
+      description: 'This endpoint login a user into the application'
+      summary: 'Login the user into the application'
+      tags:
+        - User
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          description: "This is the request body object containing users' login information"
+          schema:
+            $ref: '#/definitions/UserLoginrequest'
+      responses:
+        200:
+          description: 'User has been logged in successfully'
+        401:
+          description: 'User has entered incorrect details'
+        404:
+          description: 'User not found in the database'
+        500:
+          description: 'Internal server error'
+  /profile:
+    get:
+      description: 'Fetches the user information from the database'
+      summary: 'Gets users profile'
+      tags:
+        - User
+      produces:
+        - application/json,
+      security:
+        - Bearer: []
+      responses:
+        401:
+          description: 'Authentication Error'
+        200:
+          description: 'Returns the user information'
+        500:
+          description: 'Internal server error'
+
+    put:
+      description: "Updates the user's notification preferences"
+      summary: "Updates user's profile"
+      tags:
+        - User
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          description: ''
+          schema:
+            $ref: '#/definitions/UpdateProfilerequest'
+      responses:
+        401:
+          description: 'Authentication Error'
+        200:
+          description: 'User preferences has been updated'
+        500:
+          description: 'Internal server error'
+  /entries:
+    get:
+      description: "Fetches and returns user's diaries"
+      summary: 'Gets the user diary entries'
+      tags:
+        - Entries
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: 'query'
+          name: id
+          type: integer
+          required: false
+          description: 'Diary ID to offset from'
+      responses:
+        401:
+          description: 'Authentication Error'
+        422:
+          description: 'Unprocessable User Entry'
+        200:
+          description: "Returns the user's diary entries (or entries after if the offset is provided)"
+        500:
+          description: 'Internal server error'
+
+    post:
+      description: 'This handles the creation new entry'
+      summary: 'Creates a new entry'
+      tags:
+        - Entries
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          description: 'body object containing new entry properties and values'
+          schema:
+            $ref: '#/definitions/CreateEntriesRequest'
+      responses:
+        401:
+          description: 'Authentication Error'
+        422:
+          description: 'Unprocessable User Entry'
+        201:
+          description: 'Returns the created entry'
+        500:
+          description: 'Internal server error'
+
+  /entries/{id}:
+    get:
+      description: 'Retrives a single entry'
+      summary: 'Retrives a single entry'
+      tags:
+        - Entries
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: 'entry ID to be returned'
+      responses:
+        401:
+          description: 'Authentication Error'
+        422:
+          description: 'Unprocessable User Entry'
+        404:
+          description: 'Entry Not Found'
+        200:
+          description: 'Returns the requested entry'
+        500:
+          description: 'Internal server error'
+    
+    put:
+      description: 'Updates a single entry'
+      summary: 'Updates a single entry'
+      tags:
+        - Entries
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: 'entry ID to be updated'
+        - in: body
+          name: body
+          required: true
+          description: 'request body object containing updated entry properties and values'
+          schema:
+            $ref: '#/definitions/UpdateEntryRequest'
+      responses:
+        401:
+          description: 'Authentication Error'
+        422:
+          description: 'Unprocessable User Entry'
+        404:
+          description: 'Entry Not Found'
+        403:
+          description: 'Entry Update forbidden'
+        200:
+          description: 'Update successful'
+        500:
+          description: 'Internal server error'
+    
+    delete:
+      description: 'Deletes a single entry'
+      summary: 'Deletes a single entry'
+      tags:
+        - Entries
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: 'entry ID to be deleted'
+      responses:
+        401:
+          description: 'Authentication Error'
+        422:
+          description: 'Unprocessable User Entry'
+        404:
+          description: 'Entry Not Found'
+        200:
+          description: 'Entry successfully deleted'
+        500:
+          description: 'Internal server error'
+
+definitions:
+  UserSignUprequest:
+    title: 'User Sign Up Request'
+    type: object
+    properties:
+      email:
+        description: 'The email address of the user'
+        type: string
+      fullname:
+        description: 'The Fullname of the user'
+        type: string
+      password:
+        description: 'The Password of the user'
+        type: string
+    example:
+      email: example@example.com
+      fullname: User
+      password: user1234
+    required:
+      - email, fullname, password
+
+  UserLoginrequest:
+    title: 'User Login Request'
+    type: object
+    properties:
+      email:
+        description: 'The email address of the user'
+        type: string
+      password:
+        description: 'The Password of the user'
+        type: string
+    example:
+      email: example@example.com
+      password: user1234
+    required:
+      - email, password
+
+  UpdateProfilerequest:
+    title: 'Update Profile Request'
+    type: object
+    properties:
+      reminder:
+        description: 'Notification State'
+        type: boolean
+      pushSubscription:
+        description: 'Push Subcription Object'
+        type: JSON
+    required:
+      - reminder, pushSubscription
+
+  CreateEntriesRequest:
+    title: 'Create New Entry Request'
+    type: object
+    properties:
+      title:
+        description: 'Entry Title'
+        type: string
+      content:
+        description: 'Entry Content/Body'
+        type: string
+    example:
+      title: Hello World
+      content: One code at a time!
+    required:
+      - title, content
+
+  UpdateEntryRequest:
+      title: 'Update Entry Request'
+      type: object
+      properties:
+        title:
+          description: 'Title of the Entry'
+          type: string
+        content:
+          description: 'Entry Content/Body'
+          type: string
+      example:
+        title: 'Hello World - Updated'
+        content: 'Its awesome like that.'
+      required:
+        - title, content    
