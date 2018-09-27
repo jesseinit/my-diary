@@ -1,4 +1,7 @@
 const spinner = document.querySelector('.loading__stories');
+const mobileMenuBtn = document.querySelector('.menu__btn');
+const mobileMenuWrapper = document.querySelector('.mobile_menu');
+const closeMenuBtn = document.querySelector('.menu__close');
 const formSubmitBtn = document.querySelector('.form .btn');
 const signUpForm = document.querySelector('#signup-form');
 const loginForm = document.querySelector('#login-form');
@@ -75,7 +78,7 @@ const fetchRequest = async (url = '', method = 'GET', body = null) => {
 const isLoggedIn = async () => {
   // TODO: Implement better login check
   const response = await fetchRequest('/api/v1/entries/');
-  if (response.err.name) {
+  if (response.err) {
     localStorage.clear();
     window.location.replace('./login.html');
   }
@@ -153,6 +156,18 @@ const handleInputErrors = (response, formClass) => {
   }
 };
 /* END OF UTILITY FUNCTIONS */
+
+/* Mobile Menu */
+if (mobileMenuBtn) {
+  mobileMenuBtn.addEventListener('click', () => {
+    mobileMenuWrapper.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  });
+  closeMenuBtn.addEventListener('click', () => {
+    mobileMenuWrapper.classList.add('hidden');
+    document.body.style.overflow = 'unset';
+  });
+}
 
 // Register User
 const registerUser = async e => {
@@ -283,7 +298,7 @@ const createStory = async e => {
     const response = await fetchRequest(newStoryURI, 'POST', newStoryInput);
     if (!response.data) {
       // Gets this from the validateInput.js Middleware
-      toast(response.message[0], toastErr);
+      toast(response.error[0], toastErr);
       createStoryBtn.classList.remove('spinning');
       createStoryBtn.textContent = 'Save Diary';
       return;
@@ -316,18 +331,20 @@ const updateStory = async e => {
       storyContent.contentEditable = true;
       storyContent.classList.add('edit-mode');
     } else {
+      e.target.textContent = 'Saving Update...';
+      e.target.classList.toggle('spinning');
       storyTitle.contentEditable = false;
       storyContent.contentEditable = false;
       storyTitle.classList.remove('edit-mode');
       storyContent.classList.remove('edit-mode');
-      e.target.textContent = 'Edit Story';
       const updateData = JSON.stringify({
         title: storyTitle.textContent,
         content: storyContent.textContent
       });
-      toast('Updating Story...', toastSuccess);
       await fetchRequest(updateEndpoint, 'PUT', updateData);
       toast('Story Has Been Updated', toastSuccess, 7000);
+      e.target.classList.toggle('spinning');
+      e.target.textContent = 'Edit Story';
     }
   } catch (error) {
     toast(error, toastErr, 3000);
