@@ -3,10 +3,10 @@ info:
   version: '1.0'
   title: My Diary
   description: 'MyDiary is an online journal where users can pen down their thoughts and feelings'
-host: https://diaryly.herokuapp.com/
-basePath: '/api/v1'
 schemes:
   - https
+host: diaryly.herokuapp.com
+basePath: '/api/v1'
 securityDefinitions:
   Bearer:
     type: apiKey

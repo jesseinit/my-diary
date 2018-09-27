@@ -332,7 +332,6 @@ const updateStory = async e => {
       storyContent.classList.add('edit-mode');
     } else {
       e.target.textContent = 'Saving Update...';
-      e.target.classList.toggle('spinning');
       storyTitle.contentEditable = false;
       storyContent.contentEditable = false;
       storyTitle.classList.remove('edit-mode');
@@ -343,7 +342,6 @@ const updateStory = async e => {
       });
       await fetchRequest(updateEndpoint, 'PUT', updateData);
       toast('Story Has Been Updated', toastSuccess, 7000);
-      e.target.classList.toggle('spinning');
       e.target.textContent = 'Edit Story';
     }
   } catch (error) {
@@ -401,7 +399,6 @@ const deleteStory = async () => {
   const storyID = new URLSearchParams(window.location.search).get('id');
   try {
     isLoggedIn();
-    toast('Deleting Message...', toastSuccess);
     const requestURL = `/api/v1/entries/${storyID}`;
     await fetchRequest(requestURL, 'DELETE');
     toast('Message Deleted', toastSuccess, 7000);
