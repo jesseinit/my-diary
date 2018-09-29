@@ -83,12 +83,12 @@ img {
   background: #51bb7b;
 }
 .mobile_menu .menu__close {
-  padding: 1px 15px;
   position: absolute;
-  right: 27px;
-  margin-top: 4px;
-  font-size: 3rem;
+  top: 4px;
+  right: 12px;
+  font-size: 2rem;
   color: #f5ffc3;
+  padding: 1px 15px;
   background: transparent;
 }
 .mobile_menu .nav__menu {
@@ -125,6 +125,25 @@ img {
 }
 .nav__menu {
   display: none;
+}
+.nav .menu__btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: transparent;
+}
+.nav .menu__btn:hover > span {
+  margin-bottom: 2px;
+}
+.nav .menu__btn span {
+  height: 2px;
+  width: 20px;
+  background: #f5ffc3;
+  margin-bottom: 4px;
+  transition: margin-bottom 0.1s ease-in-out;
+}
+.nav .menu__btn span:last-child {
+  margin-bottom: 0;
 }
 .nav .menu__item {
   display: inline-block;
@@ -627,7 +646,7 @@ img {
   text-align: center;
   width: 100%;
   padding: 50px;
-  background: url(https://www.toptal.com/designers/subtlepatterns/patterns/wavy-dots.png);
+  background: linear-gradient(rgba(245, 44, 44, 0.2), rgba(245, 44, 44, 0.3)), url(https://www.toptal.com/designers/subtlepatterns/patterns/wavy-dots.png);
 }
 .profile__stats {
   display: flex;
@@ -659,7 +678,8 @@ img {
   font-weight: 300;
 }
 .profile__setting input {
-  margin-left: 20px;
+  position: relative;
+  margin-left: 10px;
   margin-top: 2px;
 }
 
@@ -751,6 +771,19 @@ img {
   background: #6beb6b;
 }
 
+.saveSettingsSpinner::before {
+  content: '';
+  width: 0px;
+  height: 0px;
+  border-radius: 50%;
+  left: 17px;
+  top: 55%;
+  position: absolute;
+  border-top: 2px solid red;
+  border-right: 2px solid red;
+  animation: rotate360 0.4s infinite linear, exist 0.1s forwards ease;
+}
+
 .spinning {
   padding-right: 40px;
 }
@@ -805,7 +838,7 @@ img {
   }
 }
 @media screen and (min-width: 768px) {
-  .menu__btn {
+  .nav .menu__btn {
     display: none;
   }
 

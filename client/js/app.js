@@ -8,7 +8,7 @@ const loginForm = document.querySelector('#login-form');
 const storyWrapper = document.querySelector('.diary__cards');
 const diarySection = document.querySelector('.diary');
 const newStoryForm = document.querySelector('#newstory-form');
-const logoutBtn = document.querySelector('#logout');
+const logoutBtn = document.querySelectorAll('#logout');
 const deleteStoryBtn = document.querySelector('.delete-confirm');
 const notification = document.querySelector('.profile__setting input');
 const cardImage =
@@ -412,31 +412,48 @@ const deleteStory = async () => {
 const setUpNotification = async e => {
   if (e.target.checked === true) {
     try {
+      e.target.classList.add('saveSettingsSpinner');
       const swSupported = checkSwSupport(e);
       const permissionStatus = await askPermission(e);
       if (!swSupported || !permissionStatus) {
         toast('Service Worker Not Supported or Notification Not Granted', toastErr);
+        e.target.classList.remove('saveSettingsSpinner');
+        e.target.checked = false;
+        console.log(e.target.checked);
         return;
       }
       const subscription = await subscribeUser();
       const data = JSON.stringify({ reminder: true, pushSubscription: subscription });
       await fetchRequest('/api/v1/profile/', 'PUT', data);
       toast('You have subscribed to Push Notification', toastSuccess);
+      e.target.classList.remove('saveSettingsSpinner');
     } catch (error) {
       e.target.checked = false;
       toast('An error has occured...Try again later', toastErr, 6000);
+      e.target.classList.remove('saveSettingsSpinner');
     }
   } else {
     try {
+      e.target.classList.add('saveSettingsSpinner');
+      const swSupported = checkSwSupport(e);
+      const permissionStatus = await askPermission(e);
+      if (!swSupported || !permissionStatus) {
+        toast('Service Worker Not Supported or Notification Not Granted', toastErr);
+        e.target.checked = true;
+        e.target.classList.remove('saveSettingsSpinner');
+        return;
+      }
       const subscription = await subscribeUser();
       subscription.unsubscribe();
       const data = JSON.stringify({ reminder: false, pushSubscription: null });
       await fetchRequest('/api/v1/profile/', 'PUT', data);
       e.target.checked = false;
       toast('You have Unsubscribed to Push Notification', toastSuccess);
+      e.target.classList.remove('saveSettingsSpinner');
     } catch (error) {
       e.target.checked = true;
       toast('An error has occured...Try again later', toastErr);
+      e.target.classList.remove('saveSettingsSpinner');
     }
   }
 };
@@ -458,7 +475,11 @@ if (signUpForm) signUpForm.addEventListener('submit', registerUser);
 
 if (loginForm) loginForm.addEventListener('submit', loginUser);
 
-if (logoutBtn) logoutBtn.addEventListener('click', logoutUser);
+if (logoutBtn) {
+  logoutBtn.forEach(button => {
+    button.addEventListener('click', logoutUser);
+  });
+}
 
 if (newStoryForm) newStoryForm.addEventListener('submit', createStory);
 
